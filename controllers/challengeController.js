@@ -1,39 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const Challenge = require('../models/Challenge');
-const User = require('../models/User');
+const { v4: uuidv4 } = require('uuid');
+const supabase = require('../services/supabaseClient');
 const { sendInvitationEmail, sendAcceptanceNotification } = require('../services/emailService');
-const { generateToken } = require('../utils/tokenGenerator');
 
 // Create a new challenge
 router.post('/create', async (req, res) => {
   try {
     const { initiatorEmail, friendEmail, habitDescription } = req.body;
     
-    // Find or create users
-    let initiator = await User.findOne({ email: initiatorEmail });
+    // Check or create users
+    let initiator = await getUserByEmail(initiatorEmail);
     if (!initiator) {
-      initiator = new User({ email: initiatorEmail });
-      await initiator.save();
+      initiator = await createUser(initiatorEmail);
     }
     
-    let friend = await User.findOne({ email: friendEmail });
+    let friend = await getUserByEmail(friendEmail);
     if (!friend) {
-      friend = new User({ email: friendEmail });
-      await friend.save();
+      friend = await createUser(friendEmail);
     }
     
     // Create the challenge
-    const inviteToken = generateToken();
-    const challenge = new Challenge({
-      habitDescription,
-      initiator: initiator._id,
-      friend: friend._id,
-      inviteToken,
-      status: 'pending'
-    });
+    const inviteToken = uuidv4();
+    const challenge = {
+      habit_description: habitDescription,
+      initiator_id: initiator.id,
+      friend_id: friend.id,
+      invite_token: inviteToken,
+      status: 'pending',
+      created_at: new Date()
+    };
     
-    await challenge.save();
+    const { data, error } = await supabase
+      .from('challenges')
+      .insert(challenge)
+      .select()
+      .single();
+      
+    if (error) throw error;
     
     // Send invitation email
     await sendInvitationEmail(friendEmail, initiatorEmail, habitDescription, inviteToken);
@@ -53,11 +57,18 @@ router.get('/accept/:token', async (req, res) => {
   try {
     const { token } = req.params;
     
-    const challenge = await Challenge.findOne({ inviteToken: token })
-      .populate('initiator')
-      .populate('friend');
+    // Get challenge by token
+    const { data: challenge, error } = await supabase
+      .from('challenges')
+      .select(`
+        *,
+        initiator:initiator_id(id, email),
+        friend:friend_id(id, email)
+      `)
+      .eq('invite_token', token)
+      .single();
     
-    if (!challenge) {
+    if (error || !challenge) {
       return res.status(404).render('error', { message: 'Challenge not found' });
     }
     
@@ -66,25 +77,45 @@ router.get('/accept/:token', async (req, res) => {
     }
     
     // Update challenge status
-    challenge.status = 'active';
-    challenge.startDate = new Date();
-    challenge.streaks = {
-      initiator: { count: 0, history: [] },
-      friend: { count: 0, history: [] }
-    };
+    const startDate = new Date();
+    const { error: updateError } = await supabase
+      .from('challenges')
+      .update({ 
+        status: 'active',
+        start_date: startDate.toISOString(),
+        initiator_streak: 0,
+        friend_streak: 0
+      })
+      .eq('id', challenge.id);
     
-    await challenge.save();
+    if (updateError) throw updateError;
+    
+    // Initialize streak history in separate tables
+    await supabase.from('streak_history').insert([
+      {
+        challenge_id: challenge.id,
+        user_id: challenge.initiator_id,
+        streak_count: 0,
+        history: []
+      },
+      {
+        challenge_id: challenge.id,
+        user_id: challenge.friend_id,
+        streak_count: 0,
+        history: []
+      }
+    ]);
     
     // Send acceptance notification to initiator
     await sendAcceptanceNotification(
       challenge.initiator.email,
       challenge.friend.email,
-      challenge.habitDescription
+      challenge.habit_description
     );
     
     res.render('challenge-accepted', { 
       initiatorEmail: challenge.initiator.email,
-      habitDescription: challenge.habitDescription 
+      habitDescription: challenge.habit_description 
     });
   } catch (error) {
     console.error('Error accepting challenge:', error);
@@ -98,35 +129,65 @@ router.get('/checkin/:challengeId/:userId/:completed', async (req, res) => {
     const { challengeId, userId, completed } = req.params;
     const isCompleted = completed === 'yes';
     
-    const challenge = await Challenge.findById(challengeId);
-    if (!challenge) {
+    // Get challenge
+    const { data: challenge, error } = await supabase
+      .from('challenges')
+      .select('*')
+      .eq('id', challengeId)
+      .single();
+    
+    if (error || !challenge) {
       return res.status(404).render('error', { message: 'Challenge not found' });
     }
     
     const today = new Date().toISOString().split('T')[0];
-    const isInitiator = userId.toString() === challenge.initiator.toString();
-    
-    // Update streak information
+    const isInitiator = userId === challenge.initiator_id;
     const userType = isInitiator ? 'initiator' : 'friend';
-    const streakField = `streaks.${userType}`;
+    
+    // Get current streak history
+    const { data: streakData, error: streakError } = await supabase
+      .from('streak_history')
+      .select('*')
+      .eq('challenge_id', challengeId)
+      .eq('user_id', userId)
+      .single();
+      
+    if (streakError) throw streakError;
     
     if (isCompleted) {
-      // Add today to history if completed
-      await Challenge.updateOne(
-        { _id: challengeId },
-        { 
-          $push: { [`${streakField}.history`]: today },
-          $inc: { [`${streakField}.count`]: 1 }
-        }
-      );
+      // Add today to history and increment streak
+      const newHistory = [...(streakData.history || []), today];
+      const newStreak = streakData.streak_count + 1;
+      
+      await supabase
+        .from('streak_history')
+        .update({
+          streak_count: newStreak,
+          history: newHistory
+        })
+        .eq('id', streakData.id);
+      
+      // Also update the streak counter in the main challenges table
+      const updateField = isInitiator ? 'initiator_streak' : 'friend_streak';
+      await supabase
+        .from('challenges')
+        .update({ [updateField]: newStreak })
+        .eq('id', challengeId);
       
       res.render('checkin-success');
     } else {
       // Reset streak count if failed
-      await Challenge.updateOne(
-        { _id: challengeId },
-        { [`${streakField}.count`]: 0 }
-      );
+      await supabase
+        .from('streak_history')
+        .update({ streak_count: 0 })
+        .eq('id', streakData.id);
+      
+      // Also update the streak counter in the main challenges table
+      const updateField = isInitiator ? 'initiator_streak' : 'friend_streak';
+      await supabase
+        .from('challenges')
+        .update({ [updateField]: 0 })
+        .eq('id', challengeId);
       
       res.render('checkin-failed');
     }
@@ -135,5 +196,28 @@ router.get('/checkin/:challengeId/:userId/:completed', async (req, res) => {
     res.status(500).render('error', { message: 'Failed to record check-in' });
   }
 });
+
+// Helper functions to work with users
+async function getUserByEmail(email) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('email', email)
+    .single();
+  
+  if (error) return null;
+  return data;
+}
+
+async function createUser(email) {
+  const { data, error } = await supabase
+    .from('users')
+    .insert({ email })
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
 
 module.exports = router;
