@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "debug": "DEBUG=habits:* nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -17,7 +18,8 @@
     "ejs": "^3.1.9",
     "uuid": "^9.0.0",
     "node-cron": "^3.0.2",
-    "body-parser": "^1.20.2"
+    "body-parser": "^1.20.2",
+    "debug": "^4.3.4"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
