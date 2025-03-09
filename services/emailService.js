@@ -3,14 +3,40 @@ const ejs = require('ejs');
 const path = require('path');
 const supabase = require('./supabaseClient');
 
+// Create test account for development
+async function createTestAccount() {
+  const testAccount = await nodemailer.createTestAccount();
+  
+  // Create a testing transporter using Ethereal
+  return nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass
+    }
+  });
+}
+
 // Configure nodemailer
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+let transporter;
+(async function() {
+  // For development, use Ethereal (fake emails with preview)
+  if (process.env.NODE_ENV !== 'production') {
+    transporter = await createTestAccount();
+    console.log('Using Ethereal test account for email testing');
+  } else {
+    // For production, use real email service
+    transporter = nodemailer.createTransport({
+      service: process.env.EMAIL_SERVICE,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
   }
-});
+})();
 
 // Send invitation email to friend
 async function sendInvitationEmail(friendEmail, initiatorEmail, habitDescription, token) {
@@ -24,13 +50,25 @@ async function sendInvitationEmail(friendEmail, initiatorEmail, habitDescription
   });
   
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: process.env.EMAIL_FROM || 'habits@example.com',
     to: friendEmail,
     subject: `${initiatorEmail} challenged you to build a new habit!`,
     html
   };
   
-  return transporter.sendMail(mailOptions);
+  // Ensure transporter is initialized
+  if (!transporter) {
+    transporter = await createTestAccount();
+  }
+  
+  const info = await transporter.sendMail(mailOptions);
+  
+  // Log preview URL for development environment
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Email Preview URL: %s', nodemailer.getTestMessageUrl(info));
+  }
+  
+  return info;
 }
 
 // Send acceptance notification to the initiator
@@ -43,13 +81,25 @@ async function sendAcceptanceNotification(initiatorEmail, friendEmail, habitDesc
   });
   
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: process.env.EMAIL_FROM || 'habits@example.com',
     to: initiatorEmail,
     subject: `${friendEmail} accepted your habit challenge!`,
     html
   };
   
-  return transporter.sendMail(mailOptions);
+  // Ensure transporter is initialized
+  if (!transporter) {
+    transporter = await createTestAccount();
+  }
+  
+  const info = await transporter.sendMail(mailOptions);
+  
+  // Log preview URL for development environment
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Email Preview URL: %s', nodemailer.getTestMessageUrl(info));
+  }
+  
+  return info;
 }
 
 // Send daily check-in emails to both participants
@@ -70,6 +120,11 @@ async function sendDailyCheckIns() {
   }
   
   const templatePath = path.join(__dirname, '../email_templates/daily-checkin.ejs');
+  
+  // Ensure transporter is initialized
+  if (!transporter) {
+    transporter = await createTestAccount();
+  }
   
   for (const challenge of activeChallenges) {
     const today = new Date().toISOString().split('T')[0];
@@ -107,12 +162,17 @@ async function sendDailyCheckIns() {
       date: today
     });
     
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+    const initiatorInfo = await transporter.sendMail({
+      from: process.env.EMAIL_FROM || 'habits@example.com',
       to: challenge.initiator.email,
       subject: `Did you ${challenge.habit_description} today?`,
       html: initiatorHtml
     });
+    
+    // Log preview URL for development environment
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Email Preview URL: %s', nodemailer.getTestMessageUrl(initiatorInfo));
+    }
     
     // Send email to friend
     const friendHtml = await ejs.renderFile(templatePath, {
@@ -128,12 +188,17 @@ async function sendDailyCheckIns() {
       date: today
     });
     
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+    const friendInfo = await transporter.sendMail({
+      from: process.env.EMAIL_FROM || 'habits@example.com',
       to: challenge.friend.email,
       subject: `Did you ${challenge.habit_description} today?`,
       html: friendHtml
     });
+    
+    // Log preview URL for development environment
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Email Preview URL: %s', nodemailer.getTestMessageUrl(friendInfo));
+    }
   }
 }
 
@@ -181,6 +246,11 @@ async function sendStreakBrokenNotification(challengeId, userId) {
   const partner = isInitiator ? challenge.friend : challenge.initiator;
   const templatePath = path.join(__dirname, '../email_templates/streak-broken.ejs');
   
+  // Ensure transporter is initialized
+  if (!transporter) {
+    transporter = await createTestAccount();
+  }
+  
   // Notify both participants
   const userHtml = await ejs.renderFile(templatePath, {
     recipientEmail: user.email,
@@ -190,12 +260,17 @@ async function sendStreakBrokenNotification(challengeId, userId) {
     self: true
   });
   
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+  const userInfo = await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'habits@example.com',
     to: user.email,
     subject: `Your streak for ${challenge.habit_description} was broken`,
     html: userHtml
   });
+  
+  // Log preview URL for development environment
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Email Preview URL: %s', nodemailer.getTestMessageUrl(userInfo));
+  }
   
   const partnerHtml = await ejs.renderFile(templatePath, {
     recipientEmail: partner.email,
@@ -205,12 +280,17 @@ async function sendStreakBrokenNotification(challengeId, userId) {
     self: false
   });
   
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+  const partnerInfo = await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'habits@example.com',
     to: partner.email,
     subject: `${user.email}'s streak for ${challenge.habit_description} was broken`,
     html: partnerHtml
   });
+  
+  // Log preview URL for development environment
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Email Preview URL: %s', nodemailer.getTestMessageUrl(partnerInfo));
+  }
 }
 
 module.exports = {
