@@ -9,7 +9,7 @@ const debug = require('debug')('habits:app');
 const supabase = require('./services/supabaseClient');
 
 const challengeRoutes = require('./controllers/challengeController');
-const { sendDailyCheckIns } = require('./services/emailService');
+const { sendDailyCheckIns, sendTestEmail } = require('./services/emailService');
 
 const app = express();
 
@@ -25,6 +25,10 @@ app.set('view engine', 'ejs');
 // Database connection check
 (async () => {
   try {
+    debug('Checking Supabase connection...');
+    debug(`URL: ${process.env.SUPABASE_URL}`);
+    debug(`KEY: ${process.env.SUPABASE_KEY ? 'Key exists' : 'Key missing'}`);
+    
     const { data, error } = await supabase.from('challenges').select('count');
     if (error) throw error;
     debug('Connected to Supabase successfully');
@@ -58,25 +62,38 @@ if (!isDev || (isDev && process.env.ENABLE_CRON === 'true')) {
 // Test endpoint for development
 if (isDev) {
   debug('Adding development test endpoints');
+  
   app.get('/test-email', async (req, res) => {
     try {
       debug('Test email endpoint called');
-      // Import the email service
-      const { sendInvitationEmail } = require('./services/emailService');
+      const recipient = process.env.TEST_RECIPIENT || 'test@example.com';
+      debug(`Sending test email to ${recipient}`);
       
-      // Send a test email
-      await sendInvitationEmail(
-        process.env.TEST_RECIPIENT || 'your-test-email@example.com', 
-        'test-initiator@example.com',
-        'Test habit description',
-        'test-token-123'
-      );
+      const result = await sendTestEmail(recipient);
       
-      res.send('Test email sent successfully. Check your logs.');
+      if (result.success) {
+        res.send(`Test email sent successfully to ${recipient}`);
+      } else {
+        res.status(500).send(`Error sending test email: ${result.message}<br>Details: ${result.details}`);
+      }
     } catch (error) {
       debug('Test email error:', error);
       res.status(500).send('Error sending test email: ' + error.message);
     }
+  });
+  
+  app.get('/env-check', (req, res) => {
+    res.send(`
+      <h1>Environment Check</h1>
+      <p>NODE_ENV: ${process.env.NODE_ENV}</p>
+      <p>PORT: ${process.env.PORT}</p>
+      <p>APP_URL: ${process.env.APP_URL}</p>
+      <p>PUBLIC_APP_URL: ${process.env.PUBLIC_APP_URL}</p>
+      <p>SENDGRID_API_KEY: ${process.env.SENDGRID_API_KEY ? 'Set (begins with: ' + process.env.SENDGRID_API_KEY.substring(0, 5) + '...)' : 'Not set'}</p>
+      <p>EMAIL_FROM: ${process.env.EMAIL_FROM}</p>
+      <p>SUPABASE_URL: ${process.env.SUPABASE_URL ? 'Set' : 'Not set'}</p>
+      <p>SUPABASE_KEY: ${process.env.SUPABASE_KEY ? 'Set (truncated for security)' : 'Not set'}</p>
+    `);
   });
 }
 
