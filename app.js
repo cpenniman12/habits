@@ -3,8 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const cron = require('node-cron');
+const debug = require('debug')('habits:app');
 
-// Import supabase client (instead of Mongoose)
+// Import supabase client
 const supabase = require('./services/supabaseClient');
 
 const challengeRoutes = require('./controllers/challengeController');
@@ -26,9 +27,9 @@ app.set('view engine', 'ejs');
   try {
     const { data, error } = await supabase.from('challenges').select('count');
     if (error) throw error;
-    console.log('Connected to Supabase successfully');
+    debug('Connected to Supabase successfully');
   } catch (err) {
-    console.error('Could not connect to Supabase:', err);
+    debug('Could not connect to Supabase:', err);
   }
 })();
 
@@ -39,19 +40,55 @@ app.get('/', (req, res) => {
 
 app.use('/challenge', challengeRoutes);
 
+// Environment check
+const isDev = process.env.NODE_ENV === 'development';
+
 // Schedule daily check-ins at 9pm
-cron.schedule('0 21 * * *', async () => {
-  console.log('Sending daily check-ins...');
-  await sendDailyCheckIns();
-});
+// In development, only run if explicitly enabled
+if (!isDev || (isDev && process.env.ENABLE_CRON === 'true')) {
+  debug('Scheduling daily check-ins at 9pm');
+  cron.schedule('0 21 * * *', async () => {
+    debug('Sending daily check-ins...');
+    await sendDailyCheckIns();
+  });
+} else {
+  debug('Scheduled tasks are disabled in development mode');
+}
+
+// Test endpoint for development
+if (isDev) {
+  debug('Adding development test endpoints');
+  app.get('/test-email', async (req, res) => {
+    try {
+      debug('Test email endpoint called');
+      // Import the email service
+      const { sendInvitationEmail } = require('./services/emailService');
+      
+      // Send a test email
+      await sendInvitationEmail(
+        process.env.TEST_RECIPIENT || 'your-test-email@example.com', 
+        'test-initiator@example.com',
+        'Test habit description',
+        'test-token-123'
+      );
+      
+      res.send('Test email sent successfully. Check your logs.');
+    } catch (error) {
+      debug('Test email error:', error);
+      res.status(500).send('Error sending test email: ' + error.message);
+    }
+  });
+}
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  debug(err.stack);
   res.status(500).send('Something broke!');
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  debug(`Server running on port ${PORT} in ${isDev ? 'development' : 'production'} mode`);
+  debug(`App URL: ${process.env.APP_URL}`);
+  debug(`Public App URL: ${process.env.PUBLIC_APP_URL || process.env.APP_URL}`);
 });
