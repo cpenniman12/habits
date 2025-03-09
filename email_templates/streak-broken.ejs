@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streak Broken</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      color: #4CAF50;
+      margin: 0;
+    }
+    .content {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .habit {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #333;
+      padding: 10px;
+      background-color: #f0f8ff;
+      border-radius: 4px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.8em;
+      color: #777;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Habits</h1>
+      <p>Streak Update</p>
+    </div>
+    
+    <div class="content">
+      <% if (self) { %>
+        <p>Hi <%= recipientEmail %>,</p>
+        
+        <p>We noticed you missed your daily habit yesterday:</p>
+        
+        <div class="habit">
+          <%= habitDescription %>
+        </div>
+        
+        <p>Your streak of <strong><%= yourStreak %> days</strong> has been reset.</p>
+        
+        <p>Don't worry! This is completely normal when building new habits. The most important thing is to start again today and get back on track.</p>
+        
+        <p>We've notified <%= partnerEmail %> as well. Remember, you're in this together!</p>
+      <% } else { %>
+        <p>Hi <%= recipientEmail %>,</p>
+        
+        <p><%= partnerEmail %> missed their daily habit yesterday:</p>
+        
+        <div class="habit">
+          <%= habitDescription %>
+        </div>
+        
+        <p>Their streak of <strong><%= partnerStreak %> days</strong> has been reset.</p>
+        
+        <p>Consider sending them some encouragement to help them get back on track!</p>
+      <% } %>
+      
+      <p>Keep supporting each other in building better habits!</p>
+    </div>
+    
+    <div class="footer">
+      <p>Habits - A simple way to build better habits together</p>
+    </div>
+  </div>
+</body>
+</html>
