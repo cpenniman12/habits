@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error - Habits</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Habits</h1>
+    </header>
+    
+    <main>
+      <section class="error-message">
+        <h2>Oops! Something went wrong</h2>
+        <div class="message-box">
+          <p><%= message || 'An error occurred. Please try again.' %></p>
+        </div>
+        
+        <a href="/" class="btn-secondary">Back to Homepage</a>
+      </section>
+    </main>
+    
+    <footer>
+      <p>&copy; Habits - Build Better Habits Together</p>
+    </footer>
+  </div>
+</body>
+</html>
