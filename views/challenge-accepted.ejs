@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge Accepted - Habits</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Habits</h1>
+    </header>
+    
+    <main>
+      <section class="success-message">
+        <h2>Challenge Accepted!</h2>
+        <div class="message-box">
+          <p>You've accepted the challenge from <strong><%= initiatorEmail %></strong>:</p>
+          <p class="habit-description"><%= habitDescription %></p>
+          <p>You'll both receive daily check-in emails at 9pm to track your progress.</p>
+          <p>Good luck building this habit together!</p>
+        </div>
+      </section>
+    </main>
+    
+    <footer>
+      <p>&copy; Habits - Build Better Habits Together</p>
+    </footer>
+  </div>
+</body>
+</html>
