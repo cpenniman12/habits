@@ -9,6 +9,11 @@ router.post('/create', async (req, res) => {
   try {
     const { initiatorEmail, friendEmail, habitDescription } = req.body;
     
+    // Validate that initiator and friend are different emails
+    if (initiatorEmail.toLowerCase() === friendEmail.toLowerCase()) {
+      return res.status(400).render('error', { message: 'You cannot challenge yourself. Please enter a different email for your friend.' });
+    }
+    
     // Check or create users
     let initiator = await getUserByEmail(initiatorEmail);
     if (!initiator) {
@@ -39,7 +44,7 @@ router.post('/create', async (req, res) => {
       
     if (error) throw error;
     
-    // Send invitation email
+    // Send invitation email ONLY to the friend
     await sendInvitationEmail(friendEmail, initiatorEmail, habitDescription, inviteToken);
     
     res.status(201).render('challenge-created', { 
