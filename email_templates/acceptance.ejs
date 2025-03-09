@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge Accepted!</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      color: #4CAF50;
+      margin: 0;
+    }
+    .content {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .habit {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #333;
+      padding: 10px;
+      background-color: #f0f8ff;
+      border-radius: 4px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    .success-icon {
+      text-align: center;
+      font-size: 48px;
+      color: #4CAF50;
+      margin: 20px 0;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.8em;
+      color: #777;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Habits</h1>
+      <p>Build Better Habits Together</p>
+    </div>
+    
+    <div class="content">
+      <div class="success-icon">✓</div>
+      
+      <p>Great news! <strong><%= friendEmail %></strong> has accepted your habit challenge:</p>
+      
+      <div class="habit">
+        <%= habitDescription %>
+      </div>
+      
+      <p>You'll both receive daily check-in emails at 9pm to confirm whether you've completed your habit for the day.</p>
+      
+      <p>Here's to building great habits together!</p>
+    </div>
+    
+    <div class="footer">
+      <p>Habits - A simple way to build better habits together</p>
+    </div>
+  </div>
+</body>
+</html>
