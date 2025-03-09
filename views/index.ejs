@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habits - Build Good Habits Together</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Habits</h1>
+      <p class="tagline">Challenge a friend. Build good habits together.</p>
+    </header>
+    
+    <main>
+      <section class="intro">
+        <h2>How It Works</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <p>Enter a daily habit you want to build</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <p>Invite a friend to join your challenge</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <p>Get daily check-ins via email</p>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <p>Build a streak together!</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="challenge-form">
+        <h2>Create a Challenge</h2>
+        <form action="/challenge/create" method="POST">
+          <div class="form-group">
+            <label for="initiatorEmail">Your Email</label>
+            <input type="email" id="initiatorEmail" name="initiatorEmail" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="friendEmail">Friend's Email</label>
+            <input type="email" id="friendEmail" name="friendEmail" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="habitDescription">Daily Habit</label>
+            <input type="text" id="habitDescription" name="habitDescription" placeholder="e.g., Read for 30 minutes" required>
+          </div>
+          
+          <button type="submit" class="btn-primary">Send Challenge</button>
+        </form>
+      </section>
+    </main>
+    
+    <footer>
+      <p>&copy; Habits - Build Better Habits Together</p>
+    </footer>
+  </div>
+</body>
+</html>
