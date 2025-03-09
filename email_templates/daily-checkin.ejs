@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Habit Check-in</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      color: #4CAF50;
+      margin: 0;
+    }
+    .content {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .habit {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #333;
+      padding: 10px;
+      background-color: #f0f8ff;
+      border-radius: 4px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    .btn {
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin: 10px;
+      text-align: center;
+    }
+    .btn-yes {
+      background-color: #4CAF50;
+    }
+    .btn-no {
+      background-color: #f44336;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .cta {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .streak-info {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+    .streak-calendar {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0;
+    }
+    .day {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      margin: 0 2px;
+    }
+    .day-completed {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .day-missed {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.8em;
+      color: #777;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Habits</h1>
+      <p>Daily Check-in</p>
+    </div>
+    
+    <div class="content">
+      <p>Hi <%= recipientEmail %>,</p>
+      
+      <p>Did you complete your daily habit today?</p>
+      
+      <div class="habit">
+        <%= habitDescription %>
+      </div>
+      
+      <div class="cta">
+        <a href="<%= process.env.APP_URL %>/challenge/checkin/<%= challengeId %>/<%= userId %>/yes" class="btn btn-yes">Yes, I did it!</a>
+        <a href="<%= process.env.APP_URL %>/challenge/checkin/<%= challengeId %>/<%= userId %>/no" class="btn btn-no">Not today</a>
+      </div>
+      
+      <div class="streak-info">
+        <h3>Current Streak</h3>
+        <p>Your current streak: <strong><%= yourStreak %> days</strong></p>
+        <p><%= partnerEmail %>'s current streak: <strong><%= partnerStreak %> days</strong></p>
+        
+        <h4>Your last 7 days:</h4>
+        <div class="streak-calendar">
+          <% yourStreakCalendar.forEach(function(day) { %>
+            <div class="day <%= day.completed ? 'day-completed' : 'day-missed' %>">
+              <%= day.date.split('-')[2] %>
+            </div>
+          <% }); %>
+        </div>
+        
+        <h4><%= partnerEmail %>'s last 7 days:</h4>
+        <div class="streak-calendar">
+          <% partnerStreakCalendar.forEach(function(day) { %>
+            <div class="day <%= day.completed ? 'day-completed' : 'day-missed' %>">
+              <%= day.date.split('-')[2] %>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+      
+      <p>Keep up the good work and stay consistent!</p>
+    </div>
+    
+    <div class="footer">
+      <p>Habits - A simple way to build better habits together</p>
+    </div>
+  </div>
+</body>
+</html>
