@@ -9,7 +9,9 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 // Send invitation email to friend
 async function sendInvitationEmail(friendEmail, initiatorEmail, habitDescription, token) {
   const templatePath = path.join(__dirname, '../email_templates/invitation.ejs');
-  const inviteUrl = `${process.env.APP_URL}/challenge/accept/${token}`;
+  
+  // Use the PUBLIC_APP_URL for links in emails (this should be a publicly accessible URL)
+  const inviteUrl = `${process.env.PUBLIC_APP_URL || process.env.APP_URL}/challenge/accept/${token}`;
   
   const html = await ejs.renderFile(templatePath, {
     initiatorEmail,
@@ -107,6 +109,9 @@ async function sendDailyCheckIns() {
     const initiatorStreakCalendar = generateStreakCalendar(initiatorStreakData?.history || []);
     const friendStreakCalendar = generateStreakCalendar(friendStreakData?.history || []);
     
+    // Use public URL for links in emails
+    const baseUrl = process.env.PUBLIC_APP_URL || process.env.APP_URL;
+    
     try {
       // Send email to initiator
       const initiatorHtml = await ejs.renderFile(templatePath, {
@@ -119,7 +124,8 @@ async function sendDailyCheckIns() {
         partnerStreakCalendar: friendStreakCalendar,
         challengeId: challenge.id,
         userId: challenge.initiator_id,
-        date: today
+        date: today,
+        baseUrl // Pass the public URL to the template
       });
       
       await sgMail.send({
@@ -142,7 +148,8 @@ async function sendDailyCheckIns() {
         partnerStreakCalendar: initiatorStreakCalendar,
         challengeId: challenge.id,
         userId: challenge.friend_id,
-        date: today
+        date: today,
+        baseUrl // Pass the public URL to the template
       });
       
       await sgMail.send({
