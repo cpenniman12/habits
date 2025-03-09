@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const ejs = require('ejs');
 const path = require('path');
-const Challenge = require('../models/Challenge');
+const supabase = require('./supabaseClient');
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
@@ -54,37 +54,63 @@ async function sendAcceptanceNotification(initiatorEmail, friendEmail, habitDesc
 
 // Send daily check-in emails to both participants
 async function sendDailyCheckIns() {
-  const activeChallenges = await Challenge.find({ status: 'active' })
-    .populate('initiator')
-    .populate('friend');
+  // Get all active challenges with user information
+  const { data: activeChallenges, error } = await supabase
+    .from('challenges')
+    .select(`
+      *,
+      initiator:initiator_id(id, email),
+      friend:friend_id(id, email)
+    `)
+    .eq('status', 'active');
+  
+  if (error || !activeChallenges.length) {
+    console.log('No active challenges found or error:', error);
+    return;
+  }
   
   const templatePath = path.join(__dirname, '../email_templates/daily-checkin.ejs');
   
   for (const challenge of activeChallenges) {
     const today = new Date().toISOString().split('T')[0];
     
+    // Get streak history for both users
+    const { data: streakHistories, error: streakError } = await supabase
+      .from('streak_history')
+      .select('*')
+      .in('user_id', [challenge.initiator_id, challenge.friend_id])
+      .eq('challenge_id', challenge.id);
+    
+    if (streakError) {
+      console.error('Error fetching streak histories:', streakError);
+      continue;
+    }
+    
+    const initiatorStreakData = streakHistories.find(sh => sh.user_id === challenge.initiator_id);
+    const friendStreakData = streakHistories.find(sh => sh.user_id === challenge.friend_id);
+    
     // Generate visual streak calendar
-    const initiatorStreakCalendar = generateStreakCalendar(challenge.streaks.initiator.history);
-    const friendStreakCalendar = generateStreakCalendar(challenge.streaks.friend.history);
+    const initiatorStreakCalendar = generateStreakCalendar(initiatorStreakData?.history || []);
+    const friendStreakCalendar = generateStreakCalendar(friendStreakData?.history || []);
     
     // Send email to initiator
     const initiatorHtml = await ejs.renderFile(templatePath, {
       recipientEmail: challenge.initiator.email,
       partnerEmail: challenge.friend.email,
-      habitDescription: challenge.habitDescription,
-      yourStreak: challenge.streaks.initiator.count,
-      partnerStreak: challenge.streaks.friend.count,
+      habitDescription: challenge.habit_description,
+      yourStreak: challenge.initiator_streak || 0,
+      partnerStreak: challenge.friend_streak || 0,
       yourStreakCalendar: initiatorStreakCalendar,
       partnerStreakCalendar: friendStreakCalendar,
-      challengeId: challenge._id,
-      userId: challenge.initiator._id,
+      challengeId: challenge.id,
+      userId: challenge.initiator_id,
       date: today
     });
     
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to: challenge.initiator.email,
-      subject: `Did you ${challenge.habitDescription} today?`,
+      subject: `Did you ${challenge.habit_description} today?`,
       html: initiatorHtml
     });
     
@@ -92,20 +118,20 @@ async function sendDailyCheckIns() {
     const friendHtml = await ejs.renderFile(templatePath, {
       recipientEmail: challenge.friend.email,
       partnerEmail: challenge.initiator.email,
-      habitDescription: challenge.habitDescription,
-      yourStreak: challenge.streaks.friend.count,
-      partnerStreak: challenge.streaks.initiator.count,
+      habitDescription: challenge.habit_description,
+      yourStreak: challenge.friend_streak || 0,
+      partnerStreak: challenge.initiator_streak || 0,
       yourStreakCalendar: friendStreakCalendar,
       partnerStreakCalendar: initiatorStreakCalendar,
-      challengeId: challenge._id,
-      userId: challenge.friend._id,
+      challengeId: challenge.id,
+      userId: challenge.friend_id,
       date: today
     });
     
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to: challenge.friend.email,
-      subject: `Did you ${challenge.habitDescription} today?`,
+      subject: `Did you ${challenge.habit_description} today?`,
       html: friendHtml
     });
   }
@@ -133,41 +159,56 @@ function generateStreakCalendar(historyDates) {
 }
 
 // Send notification when streak is broken
-async function sendStreakBrokenNotification(challenge, userType) {
-  const templatePath = path.join(__dirname, '../email_templates/streak-broken.ejs');
+async function sendStreakBrokenNotification(challengeId, userId) {
+  // Get challenge with user information
+  const { data: challenge, error } = await supabase
+    .from('challenges')
+    .select(`
+      *,
+      initiator:initiator_id(id, email),
+      friend:friend_id(id, email)
+    `)
+    .eq('id', challengeId)
+    .single();
   
-  const isInitiator = userType === 'initiator';
+  if (error) {
+    console.error('Error fetching challenge:', error);
+    return;
+  }
+  
+  const isInitiator = userId === challenge.initiator_id;
   const user = isInitiator ? challenge.initiator : challenge.friend;
   const partner = isInitiator ? challenge.friend : challenge.initiator;
+  const templatePath = path.join(__dirname, '../email_templates/streak-broken.ejs');
   
   // Notify both participants
   const userHtml = await ejs.renderFile(templatePath, {
     recipientEmail: user.email,
     partnerEmail: partner.email,
-    habitDescription: challenge.habitDescription,
-    yourStreak: isInitiator ? challenge.streaks.initiator.count : challenge.streaks.friend.count,
+    habitDescription: challenge.habit_description,
+    yourStreak: isInitiator ? challenge.initiator_streak : challenge.friend_streak,
     self: true
   });
   
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to: user.email,
-    subject: `Your streak for ${challenge.habitDescription} was broken`,
+    subject: `Your streak for ${challenge.habit_description} was broken`,
     html: userHtml
   });
   
   const partnerHtml = await ejs.renderFile(templatePath, {
     recipientEmail: partner.email,
     partnerEmail: user.email,
-    habitDescription: challenge.habitDescription,
-    partnerStreak: isInitiator ? challenge.streaks.initiator.count : challenge.streaks.friend.count,
+    habitDescription: challenge.habit_description,
+    partnerStreak: isInitiator ? challenge.initiator_streak : challenge.friend_streak,
     self: false
   });
   
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,
     to: partner.email,
-    subject: `${user.email}'s streak for ${challenge.habitDescription} was broken`,
+    subject: `${user.email}'s streak for ${challenge.habit_description} was broken`,
     html: partnerHtml
   });
 }
