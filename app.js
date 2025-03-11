@@ -4,11 +4,12 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cron = require('node-cron');
 
-// Import supabase client (instead of Mongoose)
+// Import supabase client
 const supabase = require('./services/supabaseClient');
 
 const challengeRoutes = require('./controllers/challengeController');
 const { sendDailyCheckIns } = require('./services/emailService');
+const Dashboard = require('./models/Dashboard');
 
 const app = express();
 
@@ -33,8 +34,26 @@ app.set('view engine', 'ejs');
 })();
 
 // Routes
-app.get('/', (req, res) => {
-  res.render('index');
+app.get('/', async (req, res) => {
+  try {
+    // Get active streaks for the dashboard
+    const activeStreaks = await Dashboard.getActiveStreaks();
+    const topStreaks = await Dashboard.getTopStreaks();
+    
+    res.render('index', { 
+      activeStreaks,
+      topStreaks,
+      hasStreaks: activeStreaks.length > 0 || topStreaks.length > 0
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    res.render('index', { 
+      activeStreaks: [],
+      topStreaks: [],
+      hasStreaks: false,
+      error: 'Could not load active challenges'
+    });
+  }
 });
 
 app.use('/challenge', challengeRoutes);
