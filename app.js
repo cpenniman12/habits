@@ -39,8 +39,9 @@ app.get('/', (req, res) => {
 
 app.use('/challenge', challengeRoutes);
 
-// Schedule daily check-ins at 9pm
-cron.schedule('0 21 * * *', async () => {
+// Schedule daily check-ins at 5am ET (which is 9am UTC if your server is on UTC time)
+// Adjust the UTC hours based on your server's timezone and Daylight Saving Time if needed
+cron.schedule('0 9 * * *', async () => {
   console.log('Sending daily check-ins...');
   await sendDailyCheckIns();
 });
