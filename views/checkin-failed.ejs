@@ -3,28 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Check-in Recorded - Habits</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Check-in Recorded - Eighteen</title>
+  <style>
+    :root {
+      --primary: #4361EE;
+      --primary-dark: #3A0CA3;
+      --accent: #F72585;
+      --light: #F8F9FA;
+      --dark: #212529;
+      --success: #4CC9F0;
+      --gray: #6C757D;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .logo h1 {
+      font-size: 36px;
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+    
+    .icon {
+      width: 80px;
+      height: 80px;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin: 20px auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .retry-icon {
+      background-color: var(--accent);
+    }
+    
+    .message-box {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 30px;
+      margin: 20px 0 40px 0;
+    }
+    
+    .message-box h2 {
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    
+    .message-box p {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .footer {
+      margin-top: 40px;
+      color: var(--gray);
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Habits</h1>
-    </header>
+    <div class="logo">
+      <h1>Eighteen</h1>
+      <p>The Habit Launchpad</p>
+    </div>
     
-    <main>
-      <section class="message">
-        <h2>Check-in Recorded</h2>
-        <div class="message-box">
-          <p>We've recorded that you missed today's habit.</p>
-          <p>Don't worry - tomorrow is a new day to start again!</p>
-        </div>
-      </section>
-    </main>
+    <div class="message-box">
+      <div class="icon retry-icon">↻</div>
+      <h2>Response Recorded</h2>
+      <p>We've recorded that you missed your habit today.</p>
+      <p>Don't worry! Building a new habit is challenging, and occasional misses are normal.</p>
+      <p>Your streak has been reset, but you can start building it again tomorrow. Remember, consistency is key in the first 18 days.</p>
+      
+      <a href="/" class="btn">Return Home</a>
+    </div>
     
-    <footer>
-      <p>&copy; Habits - Build Better Habits Together</p>
-    </footer>
+    <div class="footer">
+      <p>Based on habit formation research by Phillippa Lally et al., UCL</p>
+    </div>
   </div>
 </body>
 </html>
