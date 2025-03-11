@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>18Day - Challenge Accepted!</title>
+  <title>Challenge Accepted!</title>
   <style>
     :root {
       --primary: #4361EE;
@@ -41,43 +41,25 @@
     
     .logo {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
     
     .logo h1 {
-      font-size: 32px;
-      color: var(--primary);
+      font-size: 40px;
+      color: var(--dark);
       margin-bottom: 5px;
       font-weight: 700;
     }
     
     .logo p {
       color: var(--gray);
-      font-size: 14px;
-    }
-    
-    .card {
-      background: white;
-      border-radius: 12px;
-      margin-bottom: 30px;
-    }
-    
-    .habit-box {
-      background-color: var(--light);
-      border-left: 4px solid var(--primary);
-      border-radius: 6px;
-      padding: 15px;
-      margin: 20px 0;
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--dark);
-      text-align: center;
+      font-size: 16px;
     }
     
     .success-badge {
       width: 80px;
       height: 80px;
-      background-color: var(--success);
+      background-color: #4CC9F0;
       color: white;
       border-radius: 50%;
       display: flex;
@@ -88,106 +70,73 @@
       box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3);
     }
     
-    .day-progress {
-      display: flex;
-      margin: 25px 0;
-      justify-content: space-between;
+    .greeting {
+      text-align: center;
+      margin-bottom: 25px;
     }
     
-    .day {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background-color: #E9ECEF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--dark);
-      position: relative;
+    .greeting h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
     }
     
-    .day.critical {
-      background-color: var(--accent);
-      color: white;
-    }
-    
-    .day.active {
-      background-color: var(--primary);
-      color: white;
-    }
-    
-    .day:after {
-      content: '';
-      position: absolute;
-      height: 2px;
-      background-color: #E9ECEF;
-      width: 100%;
-      left: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: -1;
-    }
-    
-    .day:last-child:after {
-      display: none;
-    }
-    
-    .info-card {
+    .habit-box {
       background-color: var(--light);
-      border-radius: 8px;
-      padding: 15px;
-      margin: 20px 0;
-      border-left: 4px solid var(--success);
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 20px;
+      margin: 25px 0;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--dark);
+      text-align: center;
     }
     
-    .info-card h3 {
-      color: var(--primary);
-      margin-bottom: 8px;
+    .explainer {
+      background-color: white;
+      border-radius: 8px;
+      padding: 0;
+      margin: 30px 0;
       font-size: 16px;
+      line-height: 1.7;
+    }
+    
+    .explainer p {
+      margin-bottom: 15px;
     }
     
     .footer {
       text-align: center;
       margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
       color: var(--gray);
-      font-size: 12px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="logo">
-      <h1>18Day</h1>
+      <h1>18 Day</h1>
       <p>The Habit Launchpad</p>
     </div>
     
-    <div class="card">
-      <div class="success-badge">✓</div>
-      
-      <h2 style="text-align: center; margin-bottom: 20px;">You're on your way!</h2>
-      
+    <div class="success-badge">✓</div>
+    
+    <div class="greeting">
+      <h2>You're on your way!</h2>
       <p><strong><%= friendEmail %></strong> has accepted your 18-day habit challenge:</p>
+    </div>
+    
+    <div class="habit-box">
+      <%= habitDescription %>
+    </div>
+    
+    <div class="explainer">
+      <p>You'll both receive daily check-ins at 9pm to track your progress through this critical habit-forming period.</p>
       
-      <div class="habit-box">
-        <%= habitDescription %>
-      </div>
-      
-      <div class="day-progress">
-        <div class="day active">1</div>
-        <div class="day critical">6</div>
-        <div class="day critical">12</div>
-        <div class="day critical">18</div>
-        <div class="day">30</div>
-      </div>
-      
-      <div class="info-card">
-        <h3>Your 18-Day Journey Has Begun</h3>
-        <p>You'll both receive daily check-in emails at 9pm. The next 18 days are critical for forming this habit into a lasting neural pathway.</p>
-      </div>
-      
-      <p>Remember, consistency is key during these first 18 days when your brain is forming new neural connections!</p>
+      <p>Research shows that after 18 days, your brain will have formed new neural pathways, making the habit almost automatic!</p>
     </div>
     
     <div class="footer">
