@@ -1,67 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Habits - Build Good Habits Together</title>
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18Day - The Habit Launchpad</title>
+    <style>
+        :root {
+            --primary: #4361EE;
+            --primary-dark: #3A0CA3;
+            --accent: #F72585;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --success: #4CC9F0;
+            --gray: #6C757D;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo h1 {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: var(--gray);
+            font-size: 16px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .card-header h2 {
+            font-size: 24px;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .card-header p {
+            color: var(--gray);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #DDE2E5;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+            outline: none;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .info-section {
+            margin-top: 40px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .day-progress {
+            display: flex;
+            margin: 30px 0;
+            justify-content: space-between;
+        }
+        
+        .day {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #E9ECEF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+            position: relative;
+        }
+        
+        .day.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+        }
+        
+        .day.critical {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .day:after {
+            content: '';
+            position: absolute;
+            height: 3px;
+            background-color: #E9ECEF;
+            width: 100%;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: -1;
+        }
+        
+        .day:last-child:after {
+            display: none;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .brain-visual {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .brain-graphic {
+            width: 200px;
+            height: 150px;
+            background-color: #F8F9FA;
+            border-radius: 100px 100px 60px 60px;
+            position: relative;
+            margin: 0 auto;
+            border: 2px solid #DEE2E6;
+            overflow: hidden;
+        }
+        
+        .neural-path {
+            position: absolute;
+            height: 4px;
+            border-radius: 2px;
+        }
+        
+        .path-1 {
+            width: 30px;
+            background-color: var(--success);
+            top: 40px;
+            left: 40px;
+            transform: rotate(30deg);
+        }
+        
+        .path-2 {
+            width: 60px;
+            background-color: var(--success);
+            top: 70px;
+            left: 60px;
+            transform: rotate(-15deg);
+        }
+        
+        .path-3 {
+            width: 80px;
+            background-color: var(--success);
+            top: 100px;
+            left: 50px;
+            transform: rotate(20deg);
+        }
+        
+        .path-4 {
+            width: 40px;
+            background-color: var(--success);
+            top: 50px;
+            right: 50px;
+            transform: rotate(-40deg);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Habits</h1>
-      <p class="tagline">Challenge a friend. Build good habits together.</p>
-    </header>
-    
-    <main>
-      <section class="intro">
-        <h2>How It Works</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <p>Enter a daily habit you want to build</p>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <p>Invite a friend to join your challenge</p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <p>Get daily check-ins via email</p>
-          </div>
-          <div class="step">
-            <div class="step-number">4</div>
-            <p>Build a streak together!</p>
-          </div>
+    <div class="container">
+        <div class="logo">
+            <h1>18Day</h1>
+            <p>The Habit Launchpad</p>
         </div>
-      </section>
-      
-      <section class="challenge-form">
-        <h2>Create a Challenge</h2>
-        <form action="/challenge/create" method="POST">
-          <div class="form-group">
-            <label for="initiatorEmail">Your Email</label>
-            <input type="email" id="initiatorEmail" name="initiatorEmail" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="friendEmail">Friend's Email</label>
-            <input type="email" id="friendEmail" name="friendEmail" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="habitDescription">Daily Habit</label>
-            <input type="text" id="habitDescription" name="habitDescription" placeholder="e.g., Read for 30 minutes" required>
-          </div>
-          
-          <button type="submit" class="btn-primary">Send Challenge</button>
-        </form>
-      </section>
-    </main>
-    
-    <footer>
-      <p>&copy; Habits - Build Better Habits Together</p>
-    </footer>
-  </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Start Your 18-Day Habit Journey</h2>
+                <p>Just 18 days to build a neural pathway that lasts a lifetime.</p>
+            </div>
+            
+            <form action="/challenge/create" method="POST">
+                <div class="form-group">
+                    <label for="habitName">What habit do you want to build?</label>
+                    <input type="text" id="habitName" name="habitDescription" class="form-control" placeholder="e.g., Morning meditation, Daily reading" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userEmail">Your email</label>
+                    <input type="email" id="userEmail" name="initiatorEmail" class="form-control" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="friendEmail">Accountability partner's email</label>
+                    <input type="email" id="friendEmail" name="friendEmail" class="form-control" placeholder="friend@example.com" required>
+                </div>
+                
+                <button type="submit" class="btn">Launch My 18-Day Challenge</button>
+            </form>
+        </div>
+        
+        <div class="info-section">
+            <div class="info-card">
+                <h3>Why 18 Days Works</h3>
+                <p>Research shows 18 days is the minimum time needed to form a simple habit. Get through this critical window, and your brain takes over from there.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>Critical Formation Period</h3>
+                <div class="day-progress">
+                    <div class="day critical">1</div>
+                    <div class="day critical">6</div>
+                    <div class="day critical">12</div>
+                    <div class="day critical">18</div>
+                    <div class="day">30</div>
+                </div>
+                <div class="progress-label">
+                    <span>Start</span>
+                    <span>Critical Period</span>
+                    <span>Automatic</span>
+                </div>
+                <p>The first 18 days show the steepest improvement in automaticity. We focus on this critical period when your brain forms new neural pathways.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>Your Brain on Habits</h3>
+                <div class="brain-visual">
+                    <div class="brain-graphic">
+                        <div class="neural-path path-1"></div>
+                        <div class="neural-path path-2"></div>
+                        <div class="neural-path path-3"></div>
+                        <div class="neural-path path-4"></div>
+                    </div>
+                </div>
+                <p>After consistent practice, your brain creates strong neural pathways. What was once difficult becomes your brain's default mode.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Based on habit formation research by Phillippa Lally et al., UCL</p>
+        </div>
+    </div>
 </body>
 </html>
