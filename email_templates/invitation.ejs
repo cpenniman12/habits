@@ -73,24 +73,22 @@
       text-align: center;
     }
     
+    .btn-container {
+      text-align: center;
+      margin: 35px 0;
+    }
+    
     .btn {
-      display: block;
-      width: 100%;
-      max-width: 300px;
-      background-color: var(--primary);
-      color: white !important;
+      display: inline-block;
+      background-color: #4361EE;
+      color: #FFFFFF;
       text-decoration: none;
       text-align: center;
       border-radius: 6px;
       padding: 15px 24px;
       font-size: 18px;
       font-weight: 600;
-      margin: 35px auto;
-      transition: background-color 0.3s;
-    }
-    
-    .btn:hover {
-      background-color: var(--primary-dark);
+      border: none;
     }
     
     .explainer {
@@ -121,9 +119,8 @@
       }
       
       .btn {
-        background-color: var(--primary);
-        color: white !important;
-        font-weight: bold;
+        background-color: #4361EE;
+        color: #FFFFFF;
       }
     }
   </style>
@@ -146,7 +143,9 @@
       <p>Research shows that after 18 days, your brain will have formed new neural pathways, making the habit almost automatic!</p>
     </div>
     
-    <a href="<%= inviteUrl %>" class="btn">Accept The Challenge</a>
+    <div class="btn-container">
+      <a href="<%= inviteUrl %>" style="background-color: #4361EE; color: #FFFFFF; text-decoration: none; padding: 15px 24px; border-radius: 6px; font-size: 18px; font-weight: 600; display: inline-block;">Accept The Challenge</a>
+    </div>
     
     <div class="footer">
       <p>Based on habit formation research by Phillippa Lally et al., UCL</p>
