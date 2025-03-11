@@ -136,6 +136,76 @@
             font-size: 18px;
         }
         
+        /* Dashboard styles */
+        .dashboard {
+            margin-top: 50px;
+        }
+        
+        .dashboard-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .streak-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        
+        .streak-table th {
+            text-align: left;
+            padding: 10px 5px;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid #eee;
+        }
+        
+        .streak-table td {
+            padding: 12px 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .streak-badge {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .streak-high {
+            background-color: var(--success);
+        }
+        
+        .streak-low {
+            background-color: var(--accent);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--gray);
+            font-style: italic;
+        }
+        
         .footer {
             text-align: center;
             margin-top: 40px;
@@ -182,6 +252,76 @@
                 <p>Research shows this is the minimum time it takes for a new habit to really stick. Studies have found that the first 18 days are when your brain creates the strongest neural pathways. Once past this critical period, the habit becomes nearly automatic and much easier to maintain.</p>
             </div>
         </div>
+        
+        <% if (typeof hasStreaks !== 'undefined' && hasStreaks) { %>
+        <div class="dashboard">
+            <h2 class="dashboard-title">Active Challenges</h2>
+            
+            <% if (typeof activeStreaks !== 'undefined' && activeStreaks.length > 0) { %>
+            <div class="dashboard-card">
+                <h3>Current Challenges</h3>
+                <table class="streak-table">
+                    <thead>
+                        <tr>
+                            <th>Habit</th>
+                            <th>Users</th>
+                            <th>Days Completed</th>
+                            <th>Start Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% activeStreaks.forEach(function(challenge) { %>
+                        <tr>
+                            <td><%= challenge.habitDescription %></td>
+                            <td>
+                                <div><%= challenge.initiatorEmail %></div>
+                                <div><%= challenge.friendEmail %></div>
+                            </td>
+                            <td>
+                                <span class="streak-badge <%= challenge.initiatorStreak >= 5 ? 'streak-high' : (challenge.initiatorStreak <= 1 ? 'streak-low' : '') %>">
+                                    <%= challenge.initiatorStreak %> days
+                                </span><br>
+                                <span class="streak-badge <%= challenge.friendStreak >= 5 ? 'streak-high' : (challenge.friendStreak <= 1 ? 'streak-low' : '') %>">
+                                    <%= challenge.friendStreak %> days
+                                </span>
+                            </td>
+                            <td><%= challenge.startDate %></td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+            
+            <% if (typeof topStreaks !== 'undefined' && topStreaks.length > 0) { %>
+            <div class="dashboard-card">
+                <h3>Top Streaks</h3>
+                <table class="streak-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Habit</th>
+                            <th>Current Streak</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% topStreaks.forEach(function(streak) { %>
+                        <tr>
+                            <td><%= streak.userEmail %></td>
+                            <td><%= streak.habitDescription %></td>
+                            <td>
+                                <span class="streak-badge <%= streak.streak >= 10 ? 'streak-high' : '' %>">
+                                    <%= streak.streak %> days
+                                </span>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+        </div>
+        <% } %>
         
         <div class="footer">
             <p>Based on habit formation research by Phillippa Lally et al., UCL</p>
