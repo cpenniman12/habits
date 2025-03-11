@@ -3,95 +3,158 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Streak Broken</title>
+  <title>Streak Update</title>
   <style>
+    :root {
+      --primary: #4361EE;
+      --primary-dark: #3A0CA3;
+      --accent: #F72585;
+      --light: #F8F9FA;
+      --dark: #212529;
+      --success: #4CC9F0;
+      --gray: #6C757D;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.6;
-      color: #333;
+      color: var(--dark);
+      background-color: #f4f5f7;
       max-width: 600px;
       margin: 0 auto;
       padding: 20px;
     }
+    
     .container {
-      background-color: #f9f9f9;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 30px;
+      margin: 0 auto;
+    }
+    
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .logo h1 {
+      font-size: 40px;
+      color: var(--dark);
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+    
+    .logo p {
+      color: var(--gray);
+      font-size: 16px;
+    }
+    
+    .greeting {
+      margin-bottom: 25px;
+      font-size: 17px;
+    }
+    
+    .habit-box {
+      background-color: var(--light);
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 20px;
+      margin: 25px 0;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--dark);
+      text-align: center;
+    }
+    
+    .message-box {
+      background-color: var(--light);
       border-radius: 8px;
       padding: 20px;
-      margin-top: 20px;
+      margin: 25px 0;
+      border-left: 4px solid var(--accent);
     }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
+    
+    .message-box h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 18px;
     }
-    .header h1 {
-      color: #4CAF50;
-      margin: 0;
-    }
-    .content {
+    
+    .explainer {
       background-color: white;
       border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 0;
+      margin: 30px 0;
+      font-size: 16px;
+      line-height: 1.7;
     }
-    .habit {
-      font-weight: bold;
-      font-size: 1.2em;
-      color: #333;
-      padding: 10px;
-      background-color: #f0f8ff;
-      border-radius: 4px;
-      margin: 15px 0;
-      text-align: center;
+    
+    .explainer p {
+      margin-bottom: 15px;
     }
+    
     .footer {
       text-align: center;
-      font-size: 0.8em;
-      color: #777;
       margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      color: var(--gray);
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>Habits</h1>
-      <p>Streak Update</p>
+    <div class="logo">
+      <h1>18 Day</h1>
+      <p>The Habit Launchpad</p>
     </div>
     
-    <div class="content">
-      <% if (self) { %>
+    <% if (self) { %>
+      <div class="greeting">
         <p>Hi <%= recipientEmail %>,</p>
-        
         <p>We noticed you missed your daily habit yesterday:</p>
-        
-        <div class="habit">
-          <%= habitDescription %>
-        </div>
-        
-        <p>Your streak of <strong><%= yourStreak %> days</strong> has been reset.</p>
-        
-        <p>Don't worry! This is completely normal when building new habits. The most important thing is to start again today and get back on track.</p>
-        
-        <p>We've notified <%= partnerEmail %> as well. Remember, you're in this together!</p>
-      <% } else { %>
-        <p>Hi <%= recipientEmail %>,</p>
-        
-        <p><%= partnerEmail %> missed their daily habit yesterday:</p>
-        
-        <div class="habit">
-          <%= habitDescription %>
-        </div>
-        
-        <p>Their streak of <strong><%= partnerStreak %> days</strong> has been reset.</p>
-        
-        <p>Consider sending them some encouragement to help them get back on track!</p>
-      <% } %>
+      </div>
       
-      <p>Keep supporting each other in building better habits!</p>
-    </div>
+      <div class="habit-box">
+        <%= habitDescription %>
+      </div>
+      
+      <div class="message-box">
+        <h3>Your streak of <%= yourStreak %> days has been reset</h3>
+        <p>Don't worry! This is completely normal when building new habits. The most important thing is to start again today and get back on track.</p>
+        <p>We've notified <%= partnerEmail %> as well. Remember, you're in this together!</p>
+      </div>
+      
+      <p>Research shows that consistency is key during these first 18 days. Keep going!</p>
+    <% } else { %>
+      <div class="greeting">
+        <p>Hi <%= recipientEmail %>,</p>
+        <p><%= partnerEmail %> missed their daily habit yesterday:</p>
+      </div>
+      
+      <div class="habit-box">
+        <%= habitDescription %>
+      </div>
+      
+      <div class="message-box">
+        <h3>Their streak of <%= partnerStreak %> days has been reset</h3>
+        <p>Consider sending them some encouragement to help them get back on track!</p>
+        <p>Remember, the first 18 days are the most critical for building a new habit.</p>
+      </div>
+      
+      <p>Research shows that after 18 days, your brain will have formed new neural pathways, making the habit almost automatic!</p>
+    <% } %>
     
     <div class="footer">
-      <p>Habits - A simple way to build better habits together</p>
+      <p>Based on habit formation research by Phillippa Lally et al., UCL</p>
     </div>
   </div>
 </body>
