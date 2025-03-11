@@ -11,7 +11,8 @@ async function sendInvitationEmail(friendEmail, initiatorEmail, habitDescription
   const templatePath = path.join(__dirname, '../email_templates/invitation.ejs');
   
   // Use the PUBLIC_APP_URL for links in emails (this should be a publicly accessible URL)
-  const inviteUrl = `${process.env.PUBLIC_APP_URL || process.env.APP_URL}/challenge/accept/${token}`;
+  const publicUrl = process.env.PUBLIC_APP_URL || 'https://your-app-domain.com';
+  const inviteUrl = `${publicUrl}/challenge/accept/${token}`;
   
   const html = await ejs.renderFile(templatePath, {
     initiatorEmail,
@@ -87,6 +88,17 @@ async function sendDailyCheckIns() {
   
   const templatePath = path.join(__dirname, '../email_templates/daily-checkin.ejs');
   
+  // Ensure we have a valid public URL for the links
+  // This is critical for email links to work properly
+  const publicUrl = process.env.PUBLIC_APP_URL;
+  if (!publicUrl) {
+    console.error('PUBLIC_APP_URL is not set in environment variables! Email links will not work correctly.');
+  }
+  
+  // Use a fallback domain if PUBLIC_APP_URL is not set
+  const baseUrl = publicUrl || 'https://your-app-domain.com';
+  console.log(`Using base URL for email links: ${baseUrl}`);
+  
   for (const challenge of activeChallenges) {
     const today = new Date().toISOString().split('T')[0];
     
@@ -108,9 +120,6 @@ async function sendDailyCheckIns() {
     // Generate visual streak calendar
     const initiatorStreakCalendar = generateStreakCalendar(initiatorStreakData?.history || []);
     const friendStreakCalendar = generateStreakCalendar(friendStreakData?.history || []);
-    
-    // Use public URL for links in emails
-    const baseUrl = process.env.PUBLIC_APP_URL || process.env.APP_URL;
     
     try {
       // Send email to initiator
