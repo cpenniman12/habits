@@ -22,20 +22,42 @@ exports.getActiveStreaks = async () => {
     
     if (error) throw error;
     
-    // Format the data for easier display
-    return data.map(challenge => ({
-      id: challenge.id,
-      habitDescription: challenge.habit_description,
-      initiatorEmail: challenge.initiator.email,
-      friendEmail: challenge.friend.email,
-      initiatorStreak: challenge.initiator_streak,
-      friendStreak: challenge.friend_streak,
-      startDate: new Date(challenge.start_date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
+    // Fetch streak history data if available
+    const enhancedData = await Promise.all(data.map(async (challenge) => {
+      // Try to get streak history for initiator
+      const { data: initiatorHistory } = await supabase
+        .from('streak_history')
+        .select('history')
+        .eq('challenge_id', challenge.id)
+        .eq('user_id', challenge.initiator_id)
+        .single();
+      
+      // Try to get streak history for friend
+      const { data: friendHistory } = await supabase
+        .from('streak_history')
+        .select('history')
+        .eq('challenge_id', challenge.id)
+        .eq('user_id', challenge.friend_id)
+        .single();
+      
+      return {
+        id: challenge.id,
+        habitDescription: challenge.habit_description,
+        initiatorEmail: challenge.initiator.email,
+        friendEmail: challenge.friend.email,
+        initiatorStreak: challenge.initiator_streak,
+        friendStreak: challenge.friend_streak,
+        startDate: new Date(challenge.start_date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }),
+        initiatorHistory: initiatorHistory?.history || [],
+        friendHistory: friendHistory?.history || []
+      };
     }));
+    
+    return enhancedData;
   } catch (error) {
     console.error('Error fetching active streaks:', error);
     throw error;
