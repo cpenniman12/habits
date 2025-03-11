@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>18Day - Your Habit Challenge</title>
+  <title>Your Habit Challenge</title>
   <style>
     :root {
       --primary: #4361EE;
@@ -46,7 +46,7 @@
     
     .logo h1 {
       font-size: 40px;
-      color: var(--primary);
+      color: var(--dark);
       margin-bottom: 5px;
       font-weight: 700;
     }
@@ -54,12 +54,6 @@
     .logo p {
       color: var(--gray);
       font-size: 16px;
-    }
-    
-    .card {
-      background: white;
-      border-radius: 12px;
-      margin-bottom: 30px;
     }
     
     .greeting {
@@ -79,36 +73,12 @@
       text-align: center;
     }
     
-    .challenge-header {
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--primary-dark);
-      margin: 35px 0 15px 0;
-    }
-    
-    .commitment {
-      background-color: var(--light);
-      border-radius: 8px;
-      padding: 20px;
-      margin: 25px 0;
-    }
-    
-    .commitment ul {
-      margin-left: 25px;
-      margin-bottom: 0;
-    }
-    
-    .commitment li {
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-    
     .btn {
       display: block;
       width: 100%;
       max-width: 300px;
       background-color: var(--primary);
-      color: white;
+      color: white !important;
       text-decoration: none;
       text-align: center;
       border-radius: 6px;
@@ -121,55 +91,6 @@
     
     .btn:hover {
       background-color: var(--primary-dark);
-    }
-    
-    .day-progress {
-      display: flex;
-      margin: 35px 0;
-      justify-content: space-between;
-    }
-    
-    .day {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-color: #E9ECEF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--dark);
-      position: relative;
-    }
-    
-    .day.critical {
-      background-color: var(--accent);
-      color: white;
-    }
-    
-    .day:after {
-      content: '';
-      position: absolute;
-      height: 3px;
-      background-color: #E9ECEF;
-      width: 100%;
-      left: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: -1;
-    }
-    
-    .day:last-child:after {
-      display: none;
-    }
-    
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-size: 14px;
-      color: var(--gray);
     }
     
     .explainer {
@@ -185,60 +106,6 @@
       margin-bottom: 15px;
     }
     
-    .brain-visual {
-      text-align: center;
-      margin: 30px 0;
-    }
-    
-    .brain-graphic {
-      width: 200px;
-      height: 150px;
-      background-color: #F8F9FA;
-      border-radius: 100px 100px 60px 60px;
-      position: relative;
-      margin: 0 auto;
-      border: 2px solid #DEE2E6;
-      overflow: hidden;
-    }
-    
-    .neural-path {
-      position: absolute;
-      height: 4px;
-      border-radius: 2px;
-    }
-    
-    .path-1 {
-      width: 30px;
-      background-color: var(--success);
-      top: 40px;
-      left: 40px;
-      transform: rotate(30deg);
-    }
-    
-    .path-2 {
-      width: 60px;
-      background-color: var(--success);
-      top: 70px;
-      left: 60px;
-      transform: rotate(-15deg);
-    }
-    
-    .path-3 {
-      width: 80px;
-      background-color: var(--success);
-      top: 100px;
-      left: 50px;
-      transform: rotate(20deg);
-    }
-    
-    .path-4 {
-      width: 40px;
-      background-color: var(--success);
-      top: 50px;
-      right: 50px;
-      transform: rotate(-40deg);
-    }
-    
     .footer {
       text-align: center;
       margin-top: 30px;
@@ -247,66 +114,39 @@
       color: var(--gray);
       font-size: 14px;
     }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .btn {
+        background-color: var(--primary);
+        color: white !important;
+        font-weight: bold;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="logo">
-      <h1>18Day</h1>
+      <h1>18 Day</h1>
       <p>The Habit Launchpad</p>
     </div>
     
-    <div class="card">
-      <div class="greeting">
-        <p>Hi there!</p>
-        <p><strong><%= initiatorEmail %></strong> has invited you to <strong><%= habitDescription %></strong> for 18 days straight!</p>
-      </div>
-      
-      <div class="habit-box">
-        <%= habitDescription %>
-      </div>
-      
-      <h2 class="challenge-header">The 18-Day Challenge</h2>
-      
-      <div class="commitment">
-        <ul>
-          <li><strong>Research shows 18 days is the critical period for habit formation.</strong></li>
-          <li>Daily check-ins to keep you accountable (9pm)</li>
-          <li>Support each other through this important phase</li>
-          <li>Once you get past this period, the habit is nearly automatic</li>
-        </ul>
-      </div>
-      
-      <div class="day-progress">
-        <div class="day critical">1</div>
-        <div class="day critical">6</div>
-        <div class="day critical">12</div>
-        <div class="day critical">18</div>
-        <div class="day">30</div>
-      </div>
-      <div class="progress-label">
-        <span>Start</span>
-        <span>Critical Period</span>
-        <span>Automatic</span>
-      </div>
-      
-      <a href="<%= inviteUrl %>" class="btn">Accept The Challenge</a>
-      
-      <div class="explainer">
-        <p>Once you accept, we'll notify <%= initiatorEmail %> and you'll both start receiving daily check-ins to track your progress through this critical habit-forming period.</p>
-        
-        <p>After 18 days, your brain will have formed new neural pathways, making this habit much easier to maintain!</p>
-        
-        <div class="brain-visual">
-          <div class="brain-graphic">
-            <div class="neural-path path-1"></div>
-            <div class="neural-path path-2"></div>
-            <div class="neural-path path-3"></div>
-            <div class="neural-path path-4"></div>
-          </div>
-        </div>
-      </div>
+    <div class="greeting">
+      <p>Hi there!</p>
+      <p><strong><%= initiatorEmail %></strong> has invited you to <strong><%= habitDescription %></strong> for 18 days straight!</p>
     </div>
+    
+    <div class="explainer">
+      <p>Once you accept, we'll notify <%= initiatorEmail %> and you'll both start receiving daily check-ins to track your progress through this critical habit-forming period.</p>
+      
+      <p>Research shows that after 18 days, your brain will have formed new neural pathways, making the habit almost automatic!</p>
+    </div>
+    
+    <a href="<%= inviteUrl %>" class="btn">Accept The Challenge</a>
     
     <div class="footer">
       <p>Based on habit formation research by Phillippa Lally et al., UCL</p>
