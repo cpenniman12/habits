@@ -162,41 +162,47 @@
             border-bottom: 1px solid #eee;
         }
         
-        .streak-table {
+        .svg-container {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
+            overflow-x: auto;
+            margin-top: 20px;
         }
         
-        .streak-table th {
-            text-align: left;
-            padding: 10px 5px;
-            font-weight: 600;
-            color: var(--dark);
-            border-bottom: 2px solid #eee;
+        .svg-container svg {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            margin: 0 auto;
+            display: block;
         }
         
-        .streak-table td {
-            padding: 12px 5px;
-            border-bottom: 1px solid #eee;
+        .streak-legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
         }
         
-        .streak-badge {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-weight: 600;
-            font-size: 14px;
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
         }
         
-        .streak-high {
-            background-color: var(--success);
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border-radius: 2px;
         }
         
-        .streak-low {
-            background-color: var(--accent);
+        .legend-completed {
+            background-color: #64b5f6;
+        }
+        
+        .legend-incomplete {
+            background-color: #e3f2fd;
+            border: 1px solid #ccd9e0;
         }
         
         .empty-state {
@@ -211,6 +217,17 @@
             margin-top: 40px;
             color: var(--gray);
             font-size: 14px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 10px;
+            }
+            
+            .card {
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
@@ -257,69 +274,45 @@
         <div class="dashboard">
             <h2 class="dashboard-title">Active Challenges</h2>
             
-            <% if (typeof activeStreaks !== 'undefined' && activeStreaks.length > 0) { %>
             <div class="dashboard-card">
-                <h3>Current Challenges</h3>
-                <table class="streak-table">
-                    <thead>
-                        <tr>
-                            <th>Habit</th>
-                            <th>Users</th>
-                            <th>Days Completed</th>
-                            <th>Start Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% activeStreaks.forEach(function(challenge) { %>
-                        <tr>
-                            <td><%= challenge.habitDescription %></td>
-                            <td>
-                                <div><%= challenge.initiatorEmail %></div>
-                                <div><%= challenge.friendEmail %></div>
-                            </td>
-                            <td>
-                                <span class="streak-badge <%= challenge.initiatorStreak >= 5 ? 'streak-high' : (challenge.initiatorStreak <= 1 ? 'streak-low' : '') %>">
-                                    <%= challenge.initiatorStreak %> days
-                                </span><br>
-                                <span class="streak-badge <%= challenge.friendStreak >= 5 ? 'streak-high' : (challenge.friendStreak <= 1 ? 'streak-low' : '') %>">
-                                    <%= challenge.friendStreak %> days
-                                </span>
-                            </td>
-                            <td><%= challenge.startDate %></td>
-                        </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+                <h3>18-Day Progress Tracker</h3>
+                
+                <div class="streak-legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-completed"></div>
+                        <span>Completed</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-incomplete"></div>
+                        <span>Not Completed</span>
+                    </div>
+                </div>
+                
+                <div class="svg-container">
+                    <%- dashboardSVG %>
+                </div>
             </div>
-            <% } %>
             
             <% if (typeof topStreaks !== 'undefined' && topStreaks.length > 0) { %>
             <div class="dashboard-card">
-                <h3>Top Streaks</h3>
-                <table class="streak-table">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Habit</th>
-                            <th>Current Streak</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% topStreaks.forEach(function(streak) { %>
-                        <tr>
-                            <td><%= streak.userEmail %></td>
-                            <td><%= streak.habitDescription %></td>
-                            <td>
-                                <span class="streak-badge <%= streak.streak >= 10 ? 'streak-high' : '' %>">
-                                    <%= streak.streak %> days
-                                </span>
-                            </td>
-                        </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+                <h3>Top Performers</h3>
+                <ul>
+                    <% topStreaks.forEach(function(streak) { %>
+                    <li>
+                        <strong><%= streak.userEmail %></strong> - <%= streak.habitDescription %>
+                        <span style="color: #4CC9F0; font-weight: bold;"><%= streak.streak %> days</span>
+                    </li>
+                    <% }); %>
+                </ul>
             </div>
             <% } %>
+        </div>
+        <% } else { %>
+        <div class="dashboard">
+            <h2 class="dashboard-title">Active Challenges</h2>
+            <div class="dashboard-card empty-state">
+                <p>No active challenges yet. Start your first habit today!</p>
+            </div>
         </div>
         <% } %>
         
