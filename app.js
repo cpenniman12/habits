@@ -10,6 +10,7 @@ const supabase = require('./services/supabaseClient');
 const challengeRoutes = require('./controllers/challengeController');
 const { sendDailyCheckIns } = require('./services/emailService');
 const Dashboard = require('./models/Dashboard');
+const { generateDashboardSVG } = require('./utils/dashboardGenerator');
 
 const app = express();
 
@@ -40,9 +41,13 @@ app.get('/', async (req, res) => {
     const activeStreaks = await Dashboard.getActiveStreaks();
     const topStreaks = await Dashboard.getTopStreaks();
     
+    // Generate SVG dashboard visualization
+    const dashboardSVG = generateDashboardSVG(activeStreaks);
+    
     res.render('index', { 
       activeStreaks,
       topStreaks,
+      dashboardSVG,
       hasStreaks: activeStreaks.length > 0 || topStreaks.length > 0
     });
   } catch (error) {
@@ -50,6 +55,7 @@ app.get('/', async (req, res) => {
     res.render('index', { 
       activeStreaks: [],
       topStreaks: [],
+      dashboardSVG: '',
       hasStreaks: false,
       error: 'Could not load active challenges'
     });
