@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>18Day - The Habit Launchpad</title>
+    <title>Eighteen - The Habit Launchpad</title>
     <style>
         :root {
             --primary: #4361EE;
@@ -136,115 +136,6 @@
             font-size: 18px;
         }
         
-        .day-progress {
-            display: flex;
-            margin: 30px 0;
-            justify-content: space-between;
-        }
-        
-        .day {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #E9ECEF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--dark);
-            position: relative;
-        }
-        
-        .day.active {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
-        }
-        
-        .day.critical {
-            background-color: var(--accent);
-            color: white;
-        }
-        
-        .day:after {
-            content: '';
-            position: absolute;
-            height: 3px;
-            background-color: #E9ECEF;
-            width: 100%;
-            left: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: -1;
-        }
-        
-        .day:last-child:after {
-            display: none;
-        }
-        
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--gray);
-        }
-        
-        .brain-visual {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .brain-graphic {
-            width: 200px;
-            height: 150px;
-            background-color: #F8F9FA;
-            border-radius: 100px 100px 60px 60px;
-            position: relative;
-            margin: 0 auto;
-            border: 2px solid #DEE2E6;
-            overflow: hidden;
-        }
-        
-        .neural-path {
-            position: absolute;
-            height: 4px;
-            border-radius: 2px;
-        }
-        
-        .path-1 {
-            width: 30px;
-            background-color: var(--success);
-            top: 40px;
-            left: 40px;
-            transform: rotate(30deg);
-        }
-        
-        .path-2 {
-            width: 60px;
-            background-color: var(--success);
-            top: 70px;
-            left: 60px;
-            transform: rotate(-15deg);
-        }
-        
-        .path-3 {
-            width: 80px;
-            background-color: var(--success);
-            top: 100px;
-            left: 50px;
-            transform: rotate(20deg);
-        }
-        
-        .path-4 {
-            width: 40px;
-            background-color: var(--success);
-            top: 50px;
-            right: 50px;
-            transform: rotate(-40deg);
-        }
-        
         .footer {
             text-align: center;
             margin-top: 40px;
@@ -256,14 +147,13 @@
 <body>
     <div class="container">
         <div class="logo">
-            <h1>18Day</h1>
+            <h1>Eighteen</h1>
             <p>The Habit Launchpad</p>
         </div>
         
         <div class="card">
             <div class="card-header">
-                <h2>Start Your 18-Day Habit Journey</h2>
-                <p>Just 18 days to build a neural pathway that lasts a lifetime.</p>
+                <h2>Commit to building a habit for 18 straight days, and invite a friend.</h2>
             </div>
             
             <form action="/challenge/create" method="POST">
@@ -288,38 +178,8 @@
         
         <div class="info-section">
             <div class="info-card">
-                <h3>Why 18 Days Works</h3>
-                <p>Research shows 18 days is the minimum time needed to form a simple habit. Get through this critical window, and your brain takes over from there.</p>
-            </div>
-            
-            <div class="info-card">
-                <h3>Critical Formation Period</h3>
-                <div class="day-progress">
-                    <div class="day critical">1</div>
-                    <div class="day critical">6</div>
-                    <div class="day critical">12</div>
-                    <div class="day critical">18</div>
-                    <div class="day">30</div>
-                </div>
-                <div class="progress-label">
-                    <span>Start</span>
-                    <span>Critical Period</span>
-                    <span>Automatic</span>
-                </div>
-                <p>The first 18 days show the steepest improvement in automaticity. We focus on this critical period when your brain forms new neural pathways.</p>
-            </div>
-            
-            <div class="info-card">
-                <h3>Your Brain on Habits</h3>
-                <div class="brain-visual">
-                    <div class="brain-graphic">
-                        <div class="neural-path path-1"></div>
-                        <div class="neural-path path-2"></div>
-                        <div class="neural-path path-3"></div>
-                        <div class="neural-path path-4"></div>
-                    </div>
-                </div>
-                <p>After consistent practice, your brain creates strong neural pathways. What was once difficult becomes your brain's default mode.</p>
+                <h3>Why 18?</h3>
+                <p>Research shows this is the minimum time it takes for a new habit to really stick. Studies have found that the first 18 days are when your brain creates the strongest neural pathways. Once past this critical period, the habit becomes nearly automatic and much easier to maintain.</p>
             </div>
         </div>
         
