@@ -70,10 +70,41 @@ The app will use `PUBLIC_APP_URL` for links in emails. This ensures that when us
 
 ## Email Check-in System
 
-- Daily check-ins are sent at 5am ET each day
+- Daily check-ins are sent at 5am ET each day (9am UTC)
 - Users have until midnight to complete their habit and mark it as done
 - Streak count increments with each successful check-in
 - Streak resets if a user misses a day or clicks "Not today"
+
+### Cron Job for Daily Emails
+
+The application uses a cron job to automatically send emails at 5am ET every day. For the cron job to work:
+
+1. Your server must be running continuously (e.g., using PM2, Docker, or a hosting service)
+2. If your server timezone is not UTC, you may need to adjust the cron schedule time
+3. The server needs proper network access to send emails via SendGrid
+
+### Manual Trigger for Check-in Emails
+
+If the automatic cron job isn't working or you need to send check-ins at a different time, you can use the manual trigger endpoint:
+
+```
+GET /admin/trigger-checkins
+```
+
+This endpoint will immediately send check-in emails to all active challenges. You can access it by visiting:
+`https://your-app-domain.com/admin/trigger-checkins`
+
+## Troubleshooting Check-in Emails
+
+If check-in emails aren't being sent:
+
+1. **Server Uptime**: Check if your server is running continuously. The cron job only works when the server is active.
+2. **Timezone Settings**: Verify that the cron schedule aligns with your server's timezone.
+3. **SendGrid Configuration**: Ensure your SendGrid API key is valid and has proper permissions.
+4. **Environment Variables**: Check that EMAIL_FROM is properly configured in your .env file.
+5. **Network Access**: Make sure your server can connect to SendGrid's API.
+6. **Application Logs**: Review server logs for any errors during the scheduled check-in time.
+7. **Manual Trigger**: Try the manual trigger endpoint to see if emails can be sent on demand.
 
 ## Database Setup
 
@@ -94,14 +125,6 @@ The app includes a visual dashboard showing:
 - Current streak progress for each participant
 - Visual representation of completed days toward the 18-day goal
 - Color-coded habit categories
-
-## Troubleshooting
-
-If you're having issues with email links not working:
-1. Make sure your `PUBLIC_APP_URL` is set correctly in your `.env` file
-2. Ensure the domain is publicly accessible from the internet
-3. Check your email service configuration
-4. Verify that your routes in `challengeController.js` are working properly
 
 ## License
 
