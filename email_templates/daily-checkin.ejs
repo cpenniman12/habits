@@ -146,6 +146,15 @@
       border: 1px solid #ddd;
     }
     
+    .time-alert {
+      background-color: rgba(247, 37, 133, 0.1);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 16px;
+    }
+    
     .footer {
       text-align: center;
       margin-top: 30px;
@@ -159,7 +168,7 @@
 <body>
   <div class="container">
     <div class="logo">
-      <h1>18 Day</h1>
+      <h1>Eighteen</h1>
       <p>The Habit Launchpad</p>
     </div>
     
@@ -170,6 +179,10 @@
     
     <div class="habit-box">
       <%= habitDescription %>
+    </div>
+    
+    <div class="time-alert">
+      <strong>Remember:</strong> You have until midnight tonight to complete your habit and mark it as done.
     </div>
     
     <div class="btn-container">
