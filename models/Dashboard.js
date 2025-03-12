@@ -1,7 +1,7 @@
 const supabase = require('../services/supabaseClient');
 
 /**
- * Get all active challenges with their current streaks
+ * Get all active challenges with their current streaks and completion history
  */
 exports.getActiveStreaks = async () => {
   try {
@@ -22,38 +22,47 @@ exports.getActiveStreaks = async () => {
     
     if (error) throw error;
     
-    // Fetch streak history data if available
+    // Fetch completions data for each challenge and user
     const enhancedData = await Promise.all(data.map(async (challenge) => {
-      // Try to get streak history for initiator
-      const { data: initiatorHistory } = await supabase
-        .from('streak_history')
-        .select('history')
+      // Get habit completions for initiator
+      const { data: initiatorCompletions, error: initiatorError } = await supabase
+        .from('habit_completions')
+        .select('completion_date')
         .eq('challenge_id', challenge.id)
-        .eq('user_id', challenge.initiator_id)
-        .single();
+        .eq('user_id', challenge.initiator.id)
+        .order('completion_date', { ascending: true });
+        
+      if (initiatorError) throw initiatorError;
       
-      // Try to get streak history for friend
-      const { data: friendHistory } = await supabase
-        .from('streak_history')
-        .select('history')
+      // Get habit completions for friend
+      const { data: friendCompletions, error: friendError } = await supabase
+        .from('habit_completions')
+        .select('completion_date')
         .eq('challenge_id', challenge.id)
-        .eq('user_id', challenge.friend_id)
-        .single();
+        .eq('user_id', challenge.friend.id)
+        .order('completion_date', { ascending: true });
+        
+      if (friendError) throw friendError;
+      
+      // Calculate day indices for each completion (0-17 for 18 day period)
+      const initiatorDayIndices = calculateDayIndices(initiatorCompletions, challenge.start_date);
+      const friendDayIndices = calculateDayIndices(friendCompletions, challenge.start_date);
       
       return {
         id: challenge.id,
         habitDescription: challenge.habit_description,
         initiatorEmail: challenge.initiator.email,
         friendEmail: challenge.friend.email,
-        initiatorStreak: challenge.initiator_streak,
-        friendStreak: challenge.friend_streak,
+        initiatorStreak: challenge.initiator_streak, // Keep for backward compatibility
+        friendStreak: challenge.friend_streak, // Keep for backward compatibility
         startDate: new Date(challenge.start_date).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'short',
           day: 'numeric'
         }),
-        initiatorHistory: initiatorHistory?.history || [],
-        friendHistory: friendHistory?.history || []
+        // Add the completion data as day indices (0-17)
+        initiatorCompletions: initiatorDayIndices,
+        friendCompletions: friendDayIndices
       };
     }));
     
@@ -65,7 +74,36 @@ exports.getActiveStreaks = async () => {
 };
 
 /**
+ * Calculate day indices (0-17) from completion dates relative to challenge start date
+ * @param {Array} completions - Array of completion records
+ * @param {String} startDateStr - Start date of the challenge as ISO string
+ * @returns {Array} - Array of day indices (0-17) that are completed
+ */
+function calculateDayIndices(completions, startDateStr) {
+  if (!completions || !startDateStr) return [];
+  
+  const startDate = new Date(startDateStr);
+  startDate.setHours(0, 0, 0, 0); // Normalize to start of day
+  
+  return completions
+    .map(completion => {
+      const completionDate = new Date(completion.completion_date);
+      completionDate.setHours(0, 0, 0, 0); // Normalize to start of day
+      
+      // Calculate days difference
+      const diffTime = completionDate.getTime() - startDate.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      // Return day index if within 18-day window
+      return diffDays >= 0 && diffDays < 18 ? diffDays : null;
+    })
+    .filter(index => index !== null); // Remove any out-of-range indices
+}
+
+/**
  * Get top 5 longest current streaks
+ * This is kept for backward compatibility but could be removed or updated
+ * to use habit_completions data instead
  */
 exports.getTopStreaks = async () => {
   try {
