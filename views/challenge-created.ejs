@@ -3,31 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Challenge Created - Habits</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Challenge Created - Eighteen</title>
+  <style>
+    :root {
+      --primary: #bbe4e9;
+      --primary-dark: #8fd0d7;
+      --accent: #F72585;
+      --light: #F8F9FA;
+      --dark: #212529;
+      --success: #4CC9F0;
+      --gray: #6C757D;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .message-box {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: var(--dark);
+    }
+    
+    p {
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    
+    strong {
+      font-weight: bold;
+    }
+    
+    .btn-secondary {
+      display: inline-block;
+      background-color: var(--primary);
+      color: var(--dark);
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--primary-dark);
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Habits</h1>
-    </header>
-    
-    <main>
-      <section class="success-message">
-        <h2>Challenge Created!</h2>
-        <div class="message-box">
-          <p>We've sent an invitation to <strong><%= friendEmail %></strong> to join your challenge:</p>
-          <p class="habit-description"><%= habitDescription %></p>
-          <p>We'll notify you when they accept the challenge.</p>
-        </div>
-        
-        <a href="/" class="btn-secondary">Back to Homepage</a>
-      </section>
-    </main>
-    
-    <footer>
-      <p>&copy; Habits - Build Better Habits Together</p>
-    </footer>
+    <div class="message-box">
+      <h2>Challenge Created!</h2>
+      <p>We've sent an invitation to <strong><%= friendEmail %></strong> and will notify you when they accept.</p>
+      <a href="/" class="btn-secondary">Back to Homepage</a>
+    </div>
   </div>
 </body>
 </html>
