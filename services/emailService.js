@@ -2,9 +2,78 @@ const sgMail = require('@sendgrid/mail');
 const ejs = require('ejs');
 const path = require('path');
 const supabase = require('./supabaseClient');
+const fs = require('fs');
 
 // Configure SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Directory for email logs
+const LOG_DIR = path.join(__dirname, '../logs');
+if (!fs.existsSync(LOG_DIR)) {
+  fs.mkdirSync(LOG_DIR);
+}
+
+// Log email activity to a file
+async function logEmailActivity(type, recipient, success, details) {
+  try {
+    const timestamp = new Date().toISOString();
+    const logData = {
+      timestamp,
+      type,
+      recipient,
+      success,
+      details
+    };
+    
+    const logPath = path.join(LOG_DIR, 'email_logs.json');
+    
+    // Read existing logs or create new array
+    let logs = [];
+    if (fs.existsSync(logPath)) {
+      const logsContent = fs.readFileSync(logPath, 'utf8');
+      logs = JSON.parse(logsContent);
+    }
+    
+    // Add new log entry
+    logs.push(logData);
+    
+    // Write logs back to file
+    fs.writeFileSync(logPath, JSON.stringify(logs, null, 2));
+    
+    // Also log to console
+    console.log(`[${timestamp}] EMAIL ${success ? 'SUCCESS' : 'FAILURE'}: ${type} to ${recipient}`);
+    if (!success) {
+      console.error(`Email error details:`, details);
+    }
+  } catch (logError) {
+    console.error('Error writing to email log:', logError);
+  }
+}
+
+// Check email logs for a specific recipient
+async function checkEmailLogs(email) {
+  const logPath = path.join(LOG_DIR, 'email_logs.json');
+  
+  if (!fs.existsSync(logPath)) {
+    return { found: false, message: 'No email logs exist yet' };
+  }
+  
+  try {
+    const logsContent = fs.readFileSync(logPath, 'utf8');
+    const logs = JSON.parse(logsContent);
+    
+    const emailLogs = logs.filter(log => log.recipient.toLowerCase() === email.toLowerCase());
+    
+    if (emailLogs.length === 0) {
+      return { found: false, message: `No email records found for ${email}` };
+    }
+    
+    return { found: true, logs: emailLogs };
+  } catch (error) {
+    console.error('Error reading email logs:', error);
+    return { found: false, message: 'Error reading email logs', error };
+  }
+}
 
 // Send invitation email to friend
 async function sendInvitationEmail(friendEmail, initiatorEmail, habitDescription, token) {
@@ -29,13 +98,15 @@ async function sendInvitationEmail(friendEmail, initiatorEmail, habitDescription
   
   try {
     await sgMail.send(msg);
-    console.log(`Invitation email sent to ${friendEmail}`);
+    await logEmailActivity('invitation', friendEmail, true, { initiator: initiatorEmail, habit: habitDescription });
     return true;
   } catch (error) {
-    console.error('Error sending invitation email:', error);
-    if (error.response) {
-      console.error(error.response.body);
-    }
+    await logEmailActivity('invitation', friendEmail, false, { 
+      error: error.message, 
+      response: error.response?.body || 'No response body',
+      initiator: initiatorEmail, 
+      habit: habitDescription 
+    });
     throw error;
   }
 }
@@ -58,13 +129,15 @@ async function sendAcceptanceNotification(initiatorEmail, friendEmail, habitDesc
   
   try {
     await sgMail.send(msg);
-    console.log(`Acceptance notification sent to ${initiatorEmail}`);
+    await logEmailActivity('acceptance', initiatorEmail, true, { friend: friendEmail, habit: habitDescription });
     return true;
   } catch (error) {
-    console.error('Error sending acceptance notification:', error);
-    if (error.response) {
-      console.error(error.response.body);
-    }
+    await logEmailActivity('acceptance', initiatorEmail, false, { 
+      error: error.message, 
+      response: error.response?.body || 'No response body',
+      friend: friendEmail, 
+      habit: habitDescription 
+    });
     throw error;
   }
 }
@@ -144,7 +217,11 @@ async function sendDailyCheckIns() {
         html: initiatorHtml
       });
       
-      console.log(`Daily check-in sent to ${challenge.initiator.email}`);
+      await logEmailActivity('daily-checkin', challenge.initiator.email, true, { 
+        partner: challenge.friend.email, 
+        habit: challenge.habit_description, 
+        challengeId: challenge.id 
+      });
       
       // Send email to friend
       const friendHtml = await ejs.renderFile(templatePath, {
@@ -168,12 +245,34 @@ async function sendDailyCheckIns() {
         html: friendHtml
       });
       
-      console.log(`Daily check-in sent to ${challenge.friend.email}`);
+      await logEmailActivity('daily-checkin', challenge.friend.email, true, { 
+        partner: challenge.initiator.email, 
+        habit: challenge.habit_description, 
+        challengeId: challenge.id 
+      });
+      
     } catch (error) {
       console.error('Error sending daily check-in emails:', error);
       if (error.response) {
         console.error(error.response.body);
       }
+      
+      // Log the error for both participants
+      await logEmailActivity('daily-checkin', challenge.initiator.email, false, { 
+        error: error.message,
+        response: error.response?.body || 'No response body',
+        partner: challenge.friend.email, 
+        habit: challenge.habit_description, 
+        challengeId: challenge.id 
+      });
+      
+      await logEmailActivity('daily-checkin', challenge.friend.email, false, { 
+        error: error.message,
+        response: error.response?.body || 'No response body',
+        partner: challenge.initiator.email, 
+        habit: challenge.habit_description, 
+        challengeId: challenge.id 
+      });
     }
   }
 }
@@ -239,7 +338,12 @@ async function sendStreakBrokenNotification(challengeId, userId) {
       html: userHtml
     });
     
-    console.log(`Streak broken notification sent to ${user.email}`);
+    await logEmailActivity('streak-broken', user.email, true, { 
+      partner: partner.email,
+      habit: challenge.habit_description,
+      self: true,
+      challengeId: challenge.id
+    });
     
     const partnerHtml = await ejs.renderFile(templatePath, {
       recipientEmail: partner.email,
@@ -256,12 +360,37 @@ async function sendStreakBrokenNotification(challengeId, userId) {
       html: partnerHtml
     });
     
-    console.log(`Partner notification sent to ${partner.email}`);
+    await logEmailActivity('streak-broken', partner.email, true, { 
+      partner: user.email,
+      habit: challenge.habit_description,
+      self: false,
+      challengeId: challenge.id
+    });
+    
   } catch (error) {
     console.error('Error sending streak broken notifications:', error);
     if (error.response) {
       console.error(error.response.body);
     }
+    
+    // Log the error for both participants
+    await logEmailActivity('streak-broken', user.email, false, { 
+      error: error.message,
+      response: error.response?.body || 'No response body',
+      partner: partner.email,
+      habit: challenge.habit_description,
+      self: true,
+      challengeId: challenge.id
+    });
+    
+    await logEmailActivity('streak-broken', partner.email, false, { 
+      error: error.message,
+      response: error.response?.body || 'No response body',
+      partner: user.email,
+      habit: challenge.habit_description,
+      self: false,
+      challengeId: challenge.id
+    });
   }
 }
 
@@ -269,5 +398,6 @@ module.exports = {
   sendInvitationEmail,
   sendAcceptanceNotification,
   sendDailyCheckIns,
-  sendStreakBrokenNotification
+  sendStreakBrokenNotification,
+  checkEmailLogs // Export the function to check logs
 };
