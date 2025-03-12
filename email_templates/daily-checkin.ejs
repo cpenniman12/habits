@@ -190,30 +190,6 @@
       <a href="<%= baseUrl %>/challenge/checkin/<%= challengeId %>/<%= userId %>/no" style="background-color: #F72585; color: white; text-decoration: none; padding: 15px 24px; border-radius: 6px; font-size: 18px; font-weight: 600; display: inline-block; margin: 0 10px;">Not today</a>
     </div>
     
-    <div class="streak-info">
-      <h3>Current Streak</h3>
-      <p>Your current streak: <strong><%= yourStreak %> days</strong></p>
-      <p><%= partnerEmail %>'s current streak: <strong><%= partnerStreak %> days</strong></p>
-      
-      <h4>Your last 7 days:</h4>
-      <div class="streak-calendar">
-        <% yourStreakCalendar.forEach(function(day) { %>
-          <div class="day <%= day.completed ? 'day-completed' : 'day-missed' %>">
-            <%= day.date.split('-')[2] %>
-          </div>
-        <% }); %>
-      </div>
-      
-      <h4><%= partnerEmail %>'s last 7 days:</h4>
-      <div class="streak-calendar">
-        <% partnerStreakCalendar.forEach(function(day) { %>
-          <div class="day <%= day.completed ? 'day-completed' : 'day-missed' %>">
-            <%= day.date.split('-')[2] %>
-          </div>
-        <% }); %>
-      </div>
-    </div>
-    
     <p>Research shows that after 18 days, your brain will have formed new neural pathways, making the habit almost automatic!</p>
     
     <div class="footer">
