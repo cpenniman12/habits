@@ -6,8 +6,8 @@
     <title>Eighteen - The Habit Launchpad</title>
     <style>
         :root {
-            --primary: #40E0D0;
-            --primary-dark: #20B2AA;
+            --primary: #bbe4e9;
+            --primary-dark: #8fd0d7;
             --accent: #F72585;
             --light: #F8F9FA;
             --dark: #212529;
@@ -95,7 +95,7 @@
         
         .form-control:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(64, 224, 208, 0.25);
+            box-shadow: 0 0 0 3px rgba(187, 228, 233, 0.25);
             outline: none;
         }
         
@@ -103,7 +103,7 @@
             display: block;
             width: 100%;
             background-color: var(--primary);
-            color: white;
+            color: var(--dark);
             border: none;
             border-radius: 6px;
             padding: 14px;
@@ -131,7 +131,7 @@
         }
         
         .info-card h3 {
-            color: var(--primary);
+            color: var(--dark);
             margin-bottom: 10px;
             font-size: 18px;
         }
@@ -156,7 +156,7 @@
         }
         
         .dashboard-card h3 {
-            color: var(--primary);
+            color: var(--dark);
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
@@ -263,16 +263,9 @@
             </form>
         </div>
         
-        <div class="info-section">
-            <div class="info-card">
-                <h3>Why 18?</h3>
-                <p>Research shows this is the minimum time it takes for a new habit to really stick. Studies have found that the first 18 days are when your brain creates the strongest neural pathways. Once past this critical period, the habit becomes nearly automatic and much easier to maintain.</p>
-            </div>
-        </div>
-        
         <% if (typeof hasStreaks !== 'undefined' && hasStreaks) { %>
         <div class="dashboard">
-            <h2 class="dashboard-title">Active Challenges</h2>
+            <h2 class="dashboard-title">See who's doing what</h2>
             
             <div class="dashboard-card">
                 <div class="svg-container">
@@ -282,12 +275,19 @@
         </div>
         <% } else { %>
         <div class="dashboard">
-            <h2 class="dashboard-title">Active Challenges</h2>
+            <h2 class="dashboard-title">See who's doing what</h2>
             <div class="dashboard-card empty-state">
                 <p>No active challenges yet. Start your first habit today!</p>
             </div>
         </div>
         <% } %>
+        
+        <div class="info-section">
+            <div class="info-card">
+                <h3>Why 18?</h3>
+                <p>Research shows this is the minimum time it takes for a new habit to really stick. Studies have found that the first 18 days are when your brain creates the strongest neural pathways. Once past this critical period, the habit becomes nearly automatic and much easier to maintain.</p>
+            </div>
+        </div>
         
         <div class="footer">
             <p>Based on habit formation research by Phillippa Lally et al., UCL</p>
