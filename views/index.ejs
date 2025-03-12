@@ -275,37 +275,10 @@
             <h2 class="dashboard-title">Active Challenges</h2>
             
             <div class="dashboard-card">
-                <h3>18-Day Progress Tracker</h3>
-                
-                <div class="streak-legend">
-                    <div class="legend-item">
-                        <div class="legend-color legend-completed"></div>
-                        <span>Completed</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color legend-incomplete"></div>
-                        <span>Not Completed</span>
-                    </div>
-                </div>
-                
                 <div class="svg-container">
                     <%- dashboardSVG %>
                 </div>
             </div>
-            
-            <% if (typeof topStreaks !== 'undefined' && topStreaks.length > 0) { %>
-            <div class="dashboard-card">
-                <h3>Top Performers</h3>
-                <ul>
-                    <% topStreaks.forEach(function(streak) { %>
-                    <li>
-                        <strong><%= streak.userEmail %></strong> - <%= streak.habitDescription %>
-                        <span style="color: #4CC9F0; font-weight: bold;"><%= streak.streak %> days</span>
-                    </li>
-                    <% }); %>
-                </ul>
-            </div>
-            <% } %>
         </div>
         <% } else { %>
         <div class="dashboard">
