@@ -3,12 +3,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const cron = require('node-cron');
+const fs = require('fs');
 
 // Import supabase client
 const supabase = require('./services/supabaseClient');
 
 const challengeRoutes = require('./controllers/challengeController');
-const { sendDailyCheckIns } = require('./services/emailService');
+const { sendDailyCheckIns, checkEmailLogs } = require('./services/emailService');
 const Dashboard = require('./models/Dashboard');
 const { generateDashboardSVG } = require('./utils/dashboardGenerator');
 
@@ -22,6 +23,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// Create logs directory if it doesn't exist
+const LOG_DIR = path.join(__dirname, 'logs');
+if (!fs.existsSync(LOG_DIR)) {
+  fs.mkdirSync(LOG_DIR);
+}
 
 // Database connection check
 (async () => {
@@ -71,6 +78,41 @@ app.get('/admin/trigger-checkins', async (req, res) => {
   } catch (error) {
     console.error('Error sending check-ins:', error);
     res.status(500).send('Error sending check-ins: ' + error.message);
+  }
+});
+
+// Add email log check route
+app.get('/admin/check-email-logs', async (req, res) => {
+  const email = req.query.email;
+  
+  if (!email) {
+    return res.status(400).send('Email parameter is required');
+  }
+  
+  try {
+    const result = await checkEmailLogs(email);
+    res.json(result);
+  } catch (error) {
+    console.error('Error checking email logs:', error);
+    res.status(500).send('Error checking email logs: ' + error.message);
+  }
+});
+
+// Add route to check all email logs
+app.get('/admin/all-email-logs', async (req, res) => {
+  const logPath = path.join(LOG_DIR, 'email_logs.json');
+  
+  if (!fs.existsSync(logPath)) {
+    return res.json({ logs: [], message: 'No email logs exist yet' });
+  }
+  
+  try {
+    const logsContent = fs.readFileSync(logPath, 'utf8');
+    const logs = JSON.parse(logsContent);
+    res.json({ logs });
+  } catch (error) {
+    console.error('Error reading email logs:', error);
+    res.status(500).send('Error reading email logs: ' + error.message);
   }
 });
 
