@@ -95,7 +95,7 @@ router.get('/accept/:token', async (req, res) => {
     
     if (updateError) throw updateError;
     
-    // Initialize streak history in separate tables
+    // Initialize streak history in separate tables (for backward compatibility)
     await supabase.from('streak_history').insert([
       {
         challenge_id: challenge.id,
@@ -149,7 +149,7 @@ router.get('/checkin/:challengeId/:userId/:completed', async (req, res) => {
     const isInitiator = userId === challenge.initiator_id;
     const userType = isInitiator ? 'initiator' : 'friend';
     
-    // Get current streak history
+    // For backward compatibility - get current streak history
     const { data: streakData, error: streakError } = await supabase
       .from('streak_history')
       .select('*')
@@ -160,7 +160,23 @@ router.get('/checkin/:challengeId/:userId/:completed', async (req, res) => {
     if (streakError) throw streakError;
     
     if (isCompleted) {
-      // Add today to history and increment streak
+      // Insert record in the habit_completions table
+      const { error: completionError } = await supabase
+        .from('habit_completions')
+        .insert({
+          challenge_id: challengeId,
+          user_id: userId,
+          completion_date: today
+        });
+      
+      if (completionError) {
+        // If error is due to duplicate, it's okay - the user already completed this today
+        if (!completionError.message.includes('duplicate')) {
+          throw completionError;
+        }
+      }
+      
+      // For backward compatibility - also update streak history
       const newHistory = [...(streakData.history || []), today];
       const newStreak = streakData.streak_count + 1;
       
