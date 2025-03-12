@@ -1,6 +1,6 @@
 /**
- * Generates an SVG visualization of habit streaks
- * @param {Array} challenges - Array of challenge objects with user data and streaks
+ * Generates an SVG visualization of habit completions
+ * @param {Array} challenges - Array of challenge objects with user data and completions
  * @returns {String} - SVG markup as a string
  */
 function generateDashboardSVG(challenges) {
@@ -42,17 +42,12 @@ function generateDashboardSVG(challenges) {
     const habitName = challenge.habitDescription;
     const initiator = {
       email: challenge.initiatorEmail,
-      streak: challenge.initiatorStreak || 0
+      completions: challenge.initiatorCompletions || []
     };
     const friend = {
       email: challenge.friendEmail,
-      streak: challenge.friendStreak || 0
+      completions: challenge.friendCompletions || []
     };
-
-    // Generate streak history - we'll generate a synthetic history based on streak count
-    // In a real implementation, you'd use actual history data from your database
-    const initiatorHistory = generateSyntheticHistory(initiator.streak);
-    const friendHistory = generateSyntheticHistory(friend.streak);
 
     // Add habit group
     svg += `
@@ -72,7 +67,7 @@ function generateDashboardSVG(challenges) {
       
       <!-- Progress Markers - 18 segments -->
       <g>
-        ${generateProgressMarkers(initiatorHistory, colorScheme)}
+        ${generateProgressMarkers(initiator.completions, colorScheme)}
       </g>
     </g>
     
@@ -86,7 +81,7 @@ function generateDashboardSVG(challenges) {
       
       <!-- Progress Markers - 18 segments -->
       <g>
-        ${generateProgressMarkers(friendHistory, colorScheme)}
+        ${generateProgressMarkers(friend.completions, colorScheme)}
       </g>
     </g>
   </g>`;
@@ -104,16 +99,16 @@ function generateDashboardSVG(challenges) {
 
 /**
  * Generate progress markers for the 18-day streak visualization
- * @param {Array} history - Array of booleans indicating completion status
+ * @param {Array} completedIndices - Array of day indices (0-17) that have been completed
  * @param {Object} colorScheme - Object with bg and fill colors
  * @returns {String} - SVG markup for progress markers
  */
-function generateProgressMarkers(history, colorScheme) {
+function generateProgressMarkers(completedIndices, colorScheme) {
   let markers = '';
   
   for (let i = 0; i < 18; i++) {
     const x = 20 + (i * 20);
-    const completed = history[i];
+    const completed = completedIndices.includes(i);
     
     if (completed) {
       markers += `
@@ -125,38 +120,6 @@ function generateProgressMarkers(history, colorScheme) {
   }
   
   return markers;
-}
-
-/**
- * Generate synthetic history data for a user based on streak count
- * @param {Number} streakCount - Current streak count
- * @returns {Array} - Array of booleans (true = completed, false = not completed)
- */
-function generateSyntheticHistory(streakCount) {
-  const history = new Array(18).fill(false);
-  
-  // Special case: if streakCount is 0, return all false
-  if (streakCount === 0) {
-    return history;
-  }
-  
-  // Fill in completed days based on streak count
-  for (let i = 0; i < Math.min(streakCount, 18); i++) {
-    history[i] = true;
-  }
-  
-  // Add some randomness to make it look more realistic
-  // For longer streaks, we might add a few "missed days" in the middle
-  if (streakCount > 10) {
-    // Add 1-2 missed days randomly within the first part of the streak
-    const missedDays = Math.floor(Math.random() * 2) + 1;
-    for (let i = 0; i < missedDays; i++) {
-      const pos = Math.floor(Math.random() * (streakCount - 5)) + 2;
-      history[pos] = false;
-    }
-  }
-  
-  return history;
 }
 
 /**
